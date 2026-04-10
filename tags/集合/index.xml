@@ -1,0 +1,37 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>集合 - 标签 - 咔咔的博客</title><link>https://ksmaple.github.io/tags/%E9%9B%86%E5%90%88/</link><description>集合 - 标签 - 咔咔的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 09 Apr 2026 10:00:00 +0800</lastBuildDate><atom:link href="https://ksmaple.github.io/tags/%E9%9B%86%E5%90%88/" rel="self" type="application/rss+xml"/><item><title>Java 集合框架详解</title><link>https://ksmaple.github.io/posts/java-collections/</link><pubDate>Thu, 09 Apr 2026 10:00:00 +0800</pubDate><author>咔咔</author><guid>https://ksmaple.github.io/posts/java-collections/</guid><description><![CDATA[<div class="featured-image">
+                <img src="/images/covers/cover-02.jpg" referrerpolicy="no-referrer">
+            </div><h2 id="概述">概述</h2>
+<p>Java 集合框架（Java Collections Framework）是 Java 提供的一套用于存储和操作一组数据的类和接口。它是 Java 编程中最常用的工具之一。</p>
+<h2 id="集合体系结构">集合体系结构</h2>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Collection
+</span></span><span class="line"><span class="cl">├── List（有序、可重复）
+</span></span><span class="line"><span class="cl">│   ├── ArrayList
+</span></span><span class="line"><span class="cl">│   ├── LinkedList
+</span></span><span class="line"><span class="cl">│   └── Vector
+</span></span><span class="line"><span class="cl">│       └── Stack
+</span></span><span class="line"><span class="cl">├── Set（无序、不可重复）
+</span></span><span class="line"><span class="cl">│   ├── HashSet
+</span></span><span class="line"><span class="cl">│   │   └── LinkedHashSet
+</span></span><span class="line"><span class="cl">│   └── TreeSet
+</span></span><span class="line"><span class="cl">└── Queue（队列）
+</span></span><span class="line"><span class="cl">    ├── LinkedList
+</span></span><span class="line"><span class="cl">    ├── PriorityQueue
+</span></span><span class="line"><span class="cl">    └── Deque
+</span></span><span class="line"><span class="cl">        ├── ArrayDeque
+</span></span><span class="line"><span class="cl">        └── LinkedList
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Map（键值对）
+</span></span><span class="line"><span class="cl">├── HashMap
+</span></span><span class="line"><span class="cl">│   └── LinkedHashMap
+</span></span><span class="line"><span class="cl">├── TreeMap
+</span></span><span class="line"><span class="cl">├── Hashtable
+</span></span><span class="line"><span class="cl">│   └── Properties
+</span></span><span class="line"><span class="cl">└── ConcurrentHashMap</span></span></code></pre></div></div>
+<h2 id="list-详解">List 详解</h2>
+<h3 id="arraylist">ArrayList</h3>
+<p>基于动态数组实现，查询快、插入删除慢。</p>]]></description></item></channel></rss>

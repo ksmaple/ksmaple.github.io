@@ -1,0 +1,35 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Hugo - 标签 - 咔咔的博客</title><link>https://ksmaple.github.io/tags/hugo/</link><description>Hugo - 标签 - 咔咔的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Fri, 10 Apr 2026 15:59:21 +0800</lastBuildDate><atom:link href="https://ksmaple.github.io/tags/hugo/" rel="self" type="application/rss+xml"/><item><title>Hugo + LoveIt + GitHub Pages 博客部署完整指南</title><link>https://ksmaple.github.io/posts/hugo-blog-deploy-guide/</link><pubDate>Fri, 10 Apr 2026 15:59:21 +0800</pubDate><author>咔咔</author><guid>https://ksmaple.github.io/posts/hugo-blog-deploy-guide/</guid><description><![CDATA[<div class="featured-image">
+                <img src="/images/covers/cover-01.jpg" referrerpolicy="no-referrer">
+            </div><p>本文记录基于 Hugo + LoveIt 主题 + GitHub Pages 的博客部署全过程，包括配置步骤、遇到的问题及解决方案。</p>]]></description></item><item><title>Hello World</title><link>https://ksmaple.github.io/posts/hello-world/</link><pubDate>Thu, 09 Apr 2026 20:00:00 +0800</pubDate><author>咔咔</author><guid>https://ksmaple.github.io/posts/hello-world/</guid><description><![CDATA[<div class="featured-image">
+                <img src="/images/covers/cover-01.jpg" referrerpolicy="no-referrer">
+            </div><p>欢迎来到 ksmaple 的博客！</p>
+<h2 id="关于这个博客">关于这个博客</h2>
+<p>这个博客使用 <strong>Hugo</strong> 和 <strong>LoveIt</strong> 主题搭建，托管在 <strong>GitHub Pages</strong> 上。</p>
+<h2 id="代码示例">代码示例</h2>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-python">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Hello, World!&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hello_world</span><span class="p">()</span></span></span></code></pre></div></div>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-java">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">HelloWorld</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;Hello, World!&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div></div>
+<h2 id="计划">计划</h2>
+<ul>
+<li><i class="far fa-square" aria-hidden="true"></i> 分享技术学习笔记</li>
+<li><i class="far fa-square" aria-hidden="true"></i> 记录生活点滴</li>
+<li><i class="far fa-square" aria-hidden="true"></i> 总结经验教训</li>
+</ul>
+<p>感谢你的访问！</p>]]></description></item></channel></rss>

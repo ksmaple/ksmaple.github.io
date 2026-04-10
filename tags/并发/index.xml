@@ -1,0 +1,80 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>并发 - 标签 - 咔咔的博客</title><link>https://ksmaple.github.io/tags/%E5%B9%B6%E5%8F%91/</link><description>并发 - 标签 - 咔咔的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 09 Apr 2026 11:00:00 +0800</lastBuildDate><atom:link href="https://ksmaple.github.io/tags/%E5%B9%B6%E5%8F%91/" rel="self" type="application/rss+xml"/><item><title>Java 线程池详解</title><link>https://ksmaple.github.io/posts/java-threadpool/</link><pubDate>Thu, 09 Apr 2026 11:00:00 +0800</pubDate><author>咔咔</author><guid>https://ksmaple.github.io/posts/java-threadpool/</guid><description><![CDATA[<div class="featured-image">
+                <img src="/images/covers/cover-06.jpg" referrerpolicy="no-referrer">
+            </div><h2 id="为什么使用线程池">为什么使用线程池</h2>
+<p>创建和销毁线程是有开销的。线程池通过复用线程，减少了线程创建和销毁的开销，提高了系统性能。</p>
+<p><strong>优点：</strong></p>
+<ul>
+<li>降低资源消耗</li>
+<li>提高响应速度</li>
+<li>便于线程管理</li>
+<li>提高系统稳定性</li>
+</ul>
+<h2 id="线程池核心参数">线程池核心参数</h2>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-java">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="nf">ThreadPoolExecutor</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">corePoolSize</span><span class="p">,</span><span class="w">           </span><span class="c1">// 核心线程数</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">maximumPoolSize</span><span class="p">,</span><span class="w">        </span><span class="c1">// 最大线程数</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">keepAliveTime</span><span class="p">,</span><span class="w">         </span><span class="c1">// 空闲线程存活时间</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">TimeUnit</span><span class="w"> </span><span class="n">unit</span><span class="p">,</span><span class="w">              </span><span class="c1">// 时间单位</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">BlockingQueue</span><span class="o">&lt;</span><span class="n">Runnable</span><span class="o">&gt;</span><span class="w"> </span><span class="n">workQueue</span><span class="p">,</span><span class="w">  </span><span class="c1">// 任务队列</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">ThreadFactory</span><span class="w"> </span><span class="n">threadFactory</span><span class="p">,</span><span class="w">        </span><span class="c1">// 线程工厂</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">RejectedExecutionHandler</span><span class="w"> </span><span class="n">handler</span><span class="w">    </span><span class="c1">// 拒绝策略</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">)</span></span></span></code></pre></div></div>
+<h3 id="参数详解">参数详解</h3>
+<table>
+  <thead>
+      <tr>
+          <th>参数</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>corePoolSize</td>
+          <td>核心线程数，即使空闲也保留</td>
+      </tr>
+      <tr>
+          <td>maximumPoolSize</td>
+          <td>最大线程数，队列满时创建</td>
+      </tr>
+      <tr>
+          <td>keepAliveTime</td>
+          <td>非核心线程空闲存活时间</td>
+      </tr>
+      <tr>
+          <td>workQueue</td>
+          <td>任务等待队列</td>
+      </tr>
+      <tr>
+          <td>threadFactory</td>
+          <td>创建线程的工厂</td>
+      </tr>
+      <tr>
+          <td>handler</td>
+          <td>任务拒绝策略</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="创建线程池">创建线程池</h2>
+<h3 id="方式一executors-工厂方法不推荐">方式一：Executors 工厂方法（不推荐）</h3>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-java">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="c1">// 固定大小线程池</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">ExecutorService</span><span class="w"> </span><span class="n">fixedPool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newFixedThreadPool</span><span class="p">(</span><span class="n">10</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 缓存线程池（可动态调整）</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">ExecutorService</span><span class="w"> </span><span class="n">cachedPool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newCachedThreadPool</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 单线程池</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">ExecutorService</span><span class="w"> </span><span class="n">singlePool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newSingleThreadExecutor</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 定时任务线程池</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">ScheduledExecutorService</span><span class="w"> </span><span class="n">scheduledPool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newScheduledThreadPool</span><span class="p">(</span><span class="n">5</span><span class="p">);</span></span></span></code></pre></div></div>
+<p><strong>为什么不推荐？</strong> Executors 创建的线程池有潜在风险：</p>]]></description></item></channel></rss>
