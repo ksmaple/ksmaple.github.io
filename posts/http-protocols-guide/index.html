@@ -1,392 +1,957 @@
-<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS - 咔咔不太卡的博客</title><meta name=Description content="技术博客，记录学习与生活"><meta property="og:title" content="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS - 咔咔不太卡的博客"><meta property="og:description" content="技术博客，记录学习与生活"><meta property="og:type" content="article"><meta property="og:url" content="https://ksmaple.github.io/posts/http-protocols-guide/"><meta property="article:published_time" content="2026-04-10T18:00:00+08:00"><meta property="article:modified_time" content="2026-04-10T18:00:00+08:00"><meta property="article:tag" content="HTTP"><meta property="article:tag" content="HTTPS"><meta property="article:tag" content="网络协议"><meta property="article:tag" content="Web性能"><meta property="article:tag" content="HTTP2"><meta name=twitter:title content="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS - 咔咔不太卡的博客"><meta name=twitter:description content="技术博客，记录学习与生活"><meta name=twitter:card content="summary"><meta name=application-name content="咔咔不太卡的技术博客"><meta name=apple-mobile-web-app-title content="咔咔不太卡的技术博客"><meta name=referrer content="no-referrer"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel=icon href=/favicon.svg><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ksmaple.github.io/posts/http-protocols-guide/><link rel=prev href=https://ksmaple.github.io/posts/java-web-frameworks-comparison/><link rel=stylesheet href=/css/style.min.css><link rel=preload href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css></noscript><link rel=preload href=https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ksmaple.github.io\/posts\/http-protocols-guide\/"},"genre":"posts","keywords":"HTTP, HTTPS, 网络协议, Web性能, HTTP2","wordcount":1540,"url":"https:\/\/ksmaple.github.io\/posts\/http-protocols-guide\/","datePublished":"2026-04-10T18:00:00+08:00","dateModified":"2026-04-10T18:00:00+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"咔咔"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script>const query=window.matchMedia("(prefers-color-scheme: dark)");function applyTheme(){let e=window.localStorage?.getItem("theme")||"auto",t=e==="dark"||e==="auto"&&query.matches;document.body.setAttribute("theme",t?"dark":"light"),document.body.setAttribute("cfg-theme",e)}applyTheme(),query.addEventListener("change",applyTheme)</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=咔咔不太卡的博客>咔咔不太卡的技术博客</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>文章 </a><a class=menu-item href=/tags/>标签 </a><a class=menu-item href=/categories/>分类 </a><a class=menu-item href=/tech-stack/>技术栈 </a><a class=menu-item href=/about/>关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
-<input type=text placeholder=搜索... id=search-input-desktop>
-<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=搜索><i class="fas fa-search" aria-hidden=true></i>
-</a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=清空><i class="fas fa-times-circle" aria-hidden=true></i>
-</a><span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-spin" aria-hidden=true></i>
-</span></span><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题><i class="fas fa-adjust" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=咔咔不太卡的博客>咔咔不太卡的技术博客</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=搜索... id=search-input-mobile>
-<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=搜索><i class="fas fa-search" aria-hidden=true></i>
-</a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=清空><i class="fas fa-times-circle" aria-hidden=true></i>
-</a><span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>取消</a></div><a class=menu-item href=/posts/ title>文章</a><a class=menu-item href=/tags/ title>标签</a><a class=menu-item href=/categories/ title>分类</a><a class=menu-item href=/tech-stack/ title>技术栈</a><a class=menu-item href=/about/ title>关于</a><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
-<i class="fas fa-adjust" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>目录</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS</h1><h2 class=single-subtitle>深入解析 HTTP/1.1、HTTP/2 与 HTTPS 的核心概念与性能差异</h2><div class=post-meta><div class=post-meta-line><span class=post-author><a href=/ title=Author rel=author class=author><i class="fas fa-user-circle" aria-hidden=true></i>咔咔</a></span>&nbsp;<span class=post-category>收录于 <a href=/categories/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/><i class="far fa-folder" aria-hidden=true></i>基础知识</a>&nbsp;<a href=/categories/%E7%BD%91%E7%BB%9C/><i class="far fa-folder" aria-hidden=true></i>网络</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt" aria-hidden=true></i>&nbsp;<time datetime=2026-04-10>2026-04-10</time>&nbsp;<i class="fas fa-pencil-alt" aria-hidden=true></i>&nbsp;约 1540 字&nbsp;
-<i class="far fa-clock" aria-hidden=true></i>&nbsp;预计阅读 8 分钟&nbsp;</div></div><div class=featured-image><img class=lazyload src=/svg/loading.min.svg data-src=/images/covers/cover-04.jpg data-srcset="/images/covers/cover-04.jpg, /images/covers/cover-04.jpg 1.5x, /images/covers/cover-04.jpg 2x" data-sizes=auto alt=/images/covers/cover-04.jpg title=/images/covers/cover-04.jpg></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>目录</span>
-<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#一http-基础概念>一、HTTP 基础概念</a><ul><li><a href=#11-什么是-http>1.1 什么是 HTTP</a></li><li><a href=#12-http-工作模式>1.2 HTTP 工作模式</a></li></ul></li><li><a href=#二http11-详解>二、HTTP/1.1 详解</a><ul><li><a href=#21-http11-核心特性>2.1 HTTP/1.1 核心特性</a></li><li><a href=#22-http11-请求报文>2.2 HTTP/1.1 请求报文</a></li><li><a href=#23-http11-响应报文>2.3 HTTP/1.1 响应报文</a></li><li><a href=#24-常见状态码>2.4 常见状态码</a></li></ul></li><li><a href=#三http2-革命性升级>三、HTTP/2 革命性升级</a><ul><li><a href=#31-为什么需要-http2>3.1 为什么需要 HTTP/2</a></li><li><a href=#32-http2-核心特性>3.2 HTTP/2 核心特性</a></li><li><a href=#33-http2-与-http11-对比>3.3 HTTP/2 与 HTTP/1.1 对比</a></li><li><a href=#34-性能提升实测>3.4 性能提升实测</a></li></ul></li><li><a href=#四https-安全传输>四、HTTPS 安全传输</a><ul><li><a href=#41-为什么需要-https>4.1 为什么需要 HTTPS</a></li><li><a href=#42-https--http--ssltls>4.2 HTTPS = HTTP + SSL/TLS</a></li><li><a href=#43-tls-握手过程>4.3 TLS 握手过程</a></li><li><a href=#44-证书体系>4.4 证书体系</a></li><li><a href=#45-https-配置示例>4.5 HTTPS 配置示例</a></li></ul></li><li><a href=#五协议对比总结>五、协议对比总结</a><ul><li><a href=#51-功能特性对比>5.1 功能特性对比</a></li><li><a href=#52-演进关系>5.2 演进关系</a></li><li><a href=#53-现代-web-推荐配置>5.3 现代 Web 推荐配置</a></li><li><a href=#54-调试工具>5.4 调试工具</a></li></ul></li><li><a href=#六常见问题>六、常见问题</a><ul><li><a href=#q1-http2-比-http11-快多少>Q1: HTTP/2 比 HTTP/1.1 快多少？</a></li><li><a href=#q2-为什么-http2-要求-https>Q2: 为什么 HTTP/2 要求 HTTPS？</a></li><li><a href=#q3-http3-和-http2-的区别>Q3: HTTP/3 和 HTTP/2 的区别？</a></li><li><a href=#q4-如何迁移到-https>Q4: 如何迁移到 HTTPS？</a></li></ul></li></ul></nav></div></div><div class=content id=content><p>HTTP（超文本传输协议）是 Web 的基石。本文将深入解析 HTTP/1.1、HTTP/2 和 HTTPS 的核心概念、演进历程及性能差异。</p><h2 id=一http-基础概念>一、HTTP 基础概念</h2><h3 id=11-什么是-http>1.1 什么是 HTTP</h3><p>HTTP（HyperText Transfer Protocol）是应用层协议，基于 TCP/IP 通信，用于客户端（浏览器）与服务器之间的数据传输。</p><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>┌─────────────────────────────────────────────────────────┐
-</span></span><span class=line><span class=cl>│                      OSI 七层模型                         │
-</span></span><span class=line><span class=cl>├─────────────────────────────────────────────────────────┤
-</span></span><span class=line><span class=cl>│  应用层  │  HTTP / HTTPS / FTP / SMTP                    │
-</span></span><span class=line><span class=cl>│  表示层  │  SSL / TLS / 加密编码                          │
-</span></span><span class=line><span class=cl>│  会话层  │  NetBIOS / RPC                                │
-</span></span><span class=line><span class=cl>│  传输层  │  TCP / UDP                                     │
-</span></span><span class=line><span class=cl>│  网络层  │  IP / ICMP / 路由协议                          │
-</span></span><span class=line><span class=cl>│ 数据链路层│  Ethernet / ARP / MAC                         │
-</span></span><span class=line><span class=cl>│  物理层  │  网线 / 光纤 / 无线信号                         │
-</span></span><span class=line><span class=cl>└─────────────────────────────────────────────────────────┘</span></span></code></pre></div></div><h3 id=12-http-工作模式>1.2 HTTP 工作模式</h3><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>客户端（浏览器）              服务器（Nginx/Apache）
-</span></span><span class=line><span class=cl>     │                              │
-</span></span><span class=line><span class=cl>     │  1. 建立 TCP 连接（三次握手）   │
-</span></span><span class=line><span class=cl>     │ ─────────────────────────────&gt;│
-</span></span><span class=line><span class=cl>     │                              │
-</span></span><span class=line><span class=cl>     │  2. 发送 HTTP Request         │
-</span></span><span class=line><span class=cl>     │     GET /index.html HTTP/1.1  │
-</span></span><span class=line><span class=cl>     │     Host: example.com         │
-</span></span><span class=line><span class=cl>     │     User-Agent: Chrome/91     │
-</span></span><span class=line><span class=cl>     │ ─────────────────────────────&gt;│
-</span></span><span class=line><span class=cl>     │                              │
-</span></span><span class=line><span class=cl>     │  3. 返回 HTTP Response        │
-</span></span><span class=line><span class=cl>     │     HTTP/1.1 200 OK           │
-</span></span><span class=line><span class=cl>     │     Content-Type: text/html   │
-</span></span><span class=line><span class=cl>     │     &lt;html&gt;...&lt;/html&gt;          │
-</span></span><span class=line><span class=cl>     │&lt;───────────────────────────── │
-</span></span><span class=line><span class=cl>     │                              │
-</span></span><span class=line><span class=cl>     │  4. 关闭连接（四次挥手）        │
-</span></span><span class=line><span class=cl>     │ ─────────────────────────────&gt;│</span></span></code></pre></div></div><hr><h2 id=二http11-详解>二、HTTP/1.1 详解</h2><h3 id=21-http11-核心特性>2.1 HTTP/1.1 核心特性</h3><p>HTTP/1.1 于 1997 年发布（RFC 2068），是目前最广泛使用的版本。</p><h4 id=持久连接persistent-connection>持久连接（Persistent Connection）</h4><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-http"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=err># HTTP/1.0 每次请求新建连接
-</span></span></span><span class=line><span class=cl><span class=nf>GET</span> <span class=nn>/page1.html</span> <span class=kr>HTTP</span><span class=o>/</span><span class=m>1.0</span>
-</span></span><span class=line><span class=cl><span class=n>Connection</span><span class=o>:</span> <span class=l>close</span>
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl><span class=g># HTTP/1.1 默认持久连接
-</span></span></span><span class=line><span class=cl><span class=g>GET /page1.html HTTP/1.1
-</span></span></span><span class=line><span class=cl><span class=g>Host: example.com
-</span></span></span><span class=line><span class=cl><span class=g>Connection: keep-alive
-</span></span></span><span class=line><span class=cl><span class=g>
-</span></span></span><span class=line><span class=cl><span class=g>GET /page2.html HTTP/1.1  # 复用同一连接
-</span></span></span><span class=line><span class=cl><span class=g>Host: example.com</span></span></span></code></pre></div></div><h4 id=管道化pipelining>管道化（Pipelining）</h4><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>HTTP/1.0 串行请求：          HTTP/1.1 管道化：
-</span></span><span class=line><span class=cl>                              
-</span></span><span class=line><span class=cl>请求1 ──► 响应1               请求1 ──►
-</span></span><span class=line><span class=cl>请求2 ──► 响应2               请求2 ──►
-</span></span><span class=line><span class=cl>请求3 ──► 响应3               请求3 ──►
-</span></span><span class=line><span class=cl>                              ◄── 响应1
-</span></span><span class=line><span class=cl>                              ◄── 响应2
-</span></span><span class=line><span class=cl>                              ◄── 响应3</span></span></code></pre></div></div><p><strong>注意</strong>：HTTP/1.1 管道化存在**队头阻塞（Head-of-Line Blocking）**问题——一个请求阻塞，后续请求必须等待。</p><h3 id=22-http11-请求报文>2.2 HTTP/1.1 请求报文</h3><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-http"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=err>GET /api/users?page=1 HTTP/1.1           ← 请求行（方法 + URI + 版本）
-</span></span></span><span class=line><span class=cl><span class=err>Host: api.example.com                    ← 必需头部
-</span></span></span><span class=line><span class=cl><span class=err>Accept: application/json                 ← 接受的数据格式
-</span></span></span><span class=line><span class=cl><span class=err>Accept-Encoding: gzip, deflate           ← 接受的压缩方式
-</span></span></span><span class=line><span class=cl><span class=err>Accept-Language: zh-CN,zh;q=0.9,en;q=0.8 ← 语言偏好
-</span></span></span><span class=line><span class=cl><span class=err>Connection: keep-alive                   ← 连接管理
-</span></span></span><span class=line><span class=cl><span class=err>Cache-Control: no-cache                  ← 缓存控制
-</span></span></span><span class=line><span class=cl><span class=err>Authorization: Bearer eyJhbG...          ← 认证信息
-</span></span></span><span class=line><span class=cl><span class=err>Cookie: sessionId=abc123                 ← Cookie
-</span></span></span><span class=line><span class=cl><span class=err>User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)  ← 客户端标识
-</span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err>                                         ← 空行
-</span></span></span><span class=line><span class=cl><span class=err>{&#34;name&#34;:&#34;张三&#34;}                          ← 请求体（POST/PUT 时）</span></span></span></code></pre></div></div><h3 id=23-http11-响应报文>2.3 HTTP/1.1 响应报文</h3><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-http"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-http data-lang=http><span class=line><span class=cl><span class=kr>HTTP</span><span class=o>/</span><span class=m>1.1</span> <span class=m>200</span> <span class=ne>OK                          ← 状态行（版本 + 状态码 + 原因）</span>
-</span></span><span class=line><span class=cl><span class=n>Date</span><span class=o>:</span> <span class=l>Mon, 23 May 2024 22:38:34 GMT      ← 服务器时间</span>
-</span></span><span class=line><span class=cl><span class=n>Content-Type</span><span class=o>:</span> <span class=l>application/json           ← 内容类型</span>
-</span></span><span class=line><span class=cl><span class=n>Content-Length</span><span class=o>:</span> <span class=l>1234                     ← 内容长度</span>
-</span></span><span class=line><span class=cl><span class=n>Content-Encoding</span><span class=o>:</span> <span class=l>gzip                   ← 压缩方式</span>
-</span></span><span class=line><span class=cl><span class=n>Cache-Control</span><span class=o>:</span> <span class=l>max-age=3600              ← 缓存策略</span>
-</span></span><span class=line><span class=cl><span class=n>ETag</span><span class=o>:</span> <span class=l>&#34;33a64df5&#34;                         ← 资源标识（用于缓存验证）</span>
-</span></span><span class=line><span class=cl><span class=n>Set-Cookie</span><span class=o>:</span> <span class=l>sessionId=xyz789; Path=/     ← 设置 Cookie</span>
-</span></span><span class=line><span class=cl><span class=n>Server</span><span class=o>:</span> <span class=l>nginx/1.18.0                     ← 服务器软件</span>
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>                                         ← 空行
-</span></span><span class=line><span class=cl>{&#34;id&#34;:1,&#34;name&#34;:&#34;张三&#34;,&#34;age&#34;:25}          ← 响应体</span></span></code></pre></div></div><h3 id=24-常见状态码>2.4 常见状态码</h3><table><thead><tr><th>类别</th><th>状态码</th><th>含义</th><th>场景</th></tr></thead><tbody><tr><td><strong>1xx</strong></td><td>100</td><td>Continue</td><td>客户端应继续请求</td></tr><tr><td></td><td>101</td><td>Switching Protocols</td><td>协议升级（如 WebSocket）</td></tr><tr><td><strong>2xx</strong></td><td>200</td><td>OK</td><td>请求成功</td></tr><tr><td></td><td>201</td><td>Created</td><td>资源创建成功</td></tr><tr><td></td><td>204</td><td>No Content</td><td>成功但无返回内容</td></tr><tr><td><strong>3xx</strong></td><td>301</td><td>Moved Permanently</td><td>永久重定向</td></tr><tr><td></td><td>302</td><td>Found</td><td>临时重定向</td></tr><tr><td></td><td>304</td><td>Not Modified</td><td>使用缓存版本</td></tr><tr><td><strong>4xx</strong></td><td>400</td><td>Bad Request</td><td>请求参数错误</td></tr><tr><td></td><td>401</td><td>Unauthorized</td><td>未认证</td></tr><tr><td></td><td>403</td><td>Forbidden</td><td>无权限</td></tr><tr><td></td><td>404</td><td>Not Found</td><td>资源不存在</td></tr><tr><td></td><td>429</td><td>Too Many Requests</td><td>请求过于频繁</td></tr><tr><td><strong>5xx</strong></td><td>500</td><td>Internal Server Error</td><td>服务器内部错误</td></tr><tr><td></td><td>502</td><td>Bad Gateway</td><td>网关错误</td></tr><tr><td></td><td>503</td><td>Service Unavailable</td><td>服务不可用</td></tr></tbody></table><hr><h2 id=三http2-革命性升级>三、HTTP/2 革命性升级</h2><h3 id=31-为什么需要-http2>3.1 为什么需要 HTTP/2</h3><p>HTTP/1.1 的性能瓶颈：</p><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>┌─────────────────────────────────────────────────────────┐
-</span></span><span class=line><span class=cl>│                 HTTP/1.1 队头阻塞问题                     │
-</span></span><span class=line><span class=cl>├─────────────────────────────────────────────────────────┤
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>│  请求1: /index.html  ◄────── 响应慢（大文件）             │
-</span></span><span class=line><span class=cl>│     │                        │                          │
-</span></span><span class=line><span class=cl>│     │  阻塞                  │                          │
-</span></span><span class=line><span class=cl>│     ▼                        ▼                          │
-</span></span><span class=line><span class=cl>│  请求2: /style.css   ◄────── 必须等待请求1完成            │
-</span></span><span class=line><span class=cl>│     │                        │                          │
-</span></span><span class=line><span class=cl>│     │  阻塞                  │                          │
-</span></span><span class=line><span class=cl>│     ▼                        ▼                          │
-</span></span><span class=line><span class=cl>│  请求3: /app.js      ◄────── 必须等待请求2完成            │
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>│  解决方案：开多个 TCP 连接（6-8个/域名）                   │
-</span></span><span class=line><span class=cl>│  新问题：连接数过多、TCP 慢启动、竞争带宽                   │
-</span></span><span class=line><span class=cl>└─────────────────────────────────────────────────────────┘</span></span></code></pre></div></div><h3 id=32-http2-核心特性>3.2 HTTP/2 核心特性</h3><h4 id=二进制分帧层binary-framing>二进制分帧层（Binary Framing）</h4><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>HTTP</span><span class=o>/</span><span class=mf>1.1</span><span class=p>:</span> <span class=err>文本协议</span>            <span class=n>HTTP</span><span class=o>/</span><span class=mi>2</span><span class=p>:</span> <span class=err>二进制协议</span>
-</span></span><span class=line><span class=cl>                                
-</span></span><span class=line><span class=cl><span class=n>GET</span> <span class=o>/</span> <span class=n>HTTP</span><span class=o>/</span><span class=mf>1.1</span>               <span class=err>┌────────────────────────┐</span>
-</span></span><span class=line><span class=cl><span class=n>Host</span><span class=p>:</span> <span class=n>example</span><span class=o>.</span><span class=n>com</span>            <span class=err>│</span> <span class=n>Length</span><span class=p>(</span><span class=mi>24</span><span class=p>)</span> <span class=err>│</span> <span class=n>Type</span><span class=p>(</span><span class=mi>8</span><span class=p>)</span>  <span class=err>│</span>
-</span></span><span class=line><span class=cl>                              <span class=err>│</span> <span class=n>Flags</span><span class=p>(</span><span class=mi>8</span><span class=p>)</span>   <span class=err>│</span> <span class=n>Reserve</span>  <span class=err>│</span>
-</span></span><span class=line><span class=cl>                              <span class=err>│</span> <span class=n>Stream</span> <span class=n>Identifier</span><span class=p>(</span><span class=mi>31</span><span class=p>)</span>  <span class=err>│</span>
-</span></span><span class=line><span class=cl>                              <span class=err>│</span> <span class=n>Payload</span>               <span class=err>│</span>
-</span></span><span class=line><span class=cl>                              <span class=err>└────────────────────────┘</span>
-</span></span><span class=line><span class=cl>                              
-</span></span><span class=line><span class=cl>                              <span class=err>帧类型：</span><span class=n>HEADERS</span><span class=err>、</span><span class=n>DATA</span><span class=err>、</span><span class=n>SETTINGS</span><span class=err>、</span>
-</span></span><span class=line><span class=cl>                                     <span class=n>PRIORITY</span><span class=err>、</span><span class=n>RST_STREAM</span><span class=err>、</span>
-</span></span><span class=line><span class=cl>                                     <span class=n>PING</span><span class=err>、</span><span class=n>GOAWAY</span><span class=err>、</span><span class=n>WINDOW_UPDATE</span></span></span></code></pre></div></div><h4 id=多路复用multiplexing>多路复用（Multiplexing）</h4><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>HTTP/1.1（6个连接）            HTTP/2（1个连接）
-</span></span><span class=line><span class=cl>                                
-</span></span><span class=line><span class=cl>连接1: index.html             连接:
-</span></span><span class=line><span class=cl>连接2: style.css                    ┌─────────┐
-</span></span><span class=line><span class=cl>连接3: app.js                       │ Stream1 │ index.html
-</span></span><span class=line><span class=cl>连接4: logo.png                     │ Stream3 │ style.css
-</span></span><span class=line><span class=cl>连接5: api/data                     │ Stream5 │ app.js
-</span></span><span class=line><span class=cl>连接6: api/user                     │ Stream7 │ logo.png
-</span></span><span class=line><span class=cl>                                    │ Stream9 │ api/data
-</span></span><span class=line><span class=cl>                                    │ Stream11│ api/user
-</span></span><span class=line><span class=cl>                                    └─────────┘
-</span></span><span class=line><span class=cl>                                    
-</span></span><span class=line><span class=cl>     6个 TCP 连接               1个 TCP 连接 + 多个 Stream</span></span></code></pre></div></div><h4 id=头部压缩hpack>头部压缩（HPACK）</h4><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>HTTP/1.1 每次请求都发完整头部：      HTTP/2 HPACK 动态表压缩：
-</span></span><span class=line><span class=cl>                                    
-</span></span><span class=line><span class=cl>请求1:                              动态表：
-</span></span><span class=line><span class=cl>Host: example.com                  62: Host: example.com
-</span></span><span class=line><span class=cl>Accept: */*                        63: Accept: */*
-</span></span><span class=line><span class=cl>Accept-Encoding: gzip, br          64: Accept-Encoding: gzip, br
-</span></span><span class=line><span class=cl>Cache-Control: no-cache            65: Cache-Control: no-cache
-</span></span><span class=line><span class=cl>                                    
-</span></span><span class=line><span class=cl>请求2（完全重复）：                  请求2（仅需发送索引）：
-</span></span><span class=line><span class=cl>Host: example.com                  62 63 64 65
-</span></span><span class=line><span class=cl>Accept: */*
-</span></span><span class=line><span class=cl>Accept-Encoding: gzip, br
-</span></span><span class=line><span class=cl>Cache-Control: no-cache
-</span></span><span class=line><span class=cl>                                    
-</span></span><span class=line><span class=cl>节省约 80% 头部流量！</span></span></code></pre></div></div><h4 id=服务器推送server-push>服务器推送（Server Push）</h4><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>传统方式：                      HTTP/2 服务器推送：
-</span></span><span class=line><span class=cl>                                
-</span></span><span class=line><span class=cl>浏览器 ──GET /index.html──►    浏览器 ──GET /index.html──►
-</span></span><span class=line><span class=cl>◄────────HTML─────────────      ◄────────HTML─────────────
-</span></span><span class=line><span class=cl>解析 HTML                       服务器预测需要：
-</span></span><span class=line><span class=cl>  │                            主动推送 style.css
-</span></span><span class=line><span class=cl>  ├──GET /style.css───►        主动推送 app.js
-</span></span><span class=line><span class=cl>  │                             
-</span></span><span class=line><span class=cl>◄─────CSS───────────────       浏览器 ──GET /logo.png───►
-</span></span><span class=line><span class=cl>  │                            ◄────────PNG──────────────
-</span></span><span class=line><span class=cl>  ├──GET /app.js──────►
-</span></span><span class=line><span class=cl>  │
-</span></span><span class=line><span class=cl>◄─────JS────────────────
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>往返次数：3次                   往返次数：2次</span></span></code></pre></div></div><h3 id=33-http2-与-http11-对比>3.3 HTTP/2 与 HTTP/1.1 对比</h3><table><thead><tr><th>特性</th><th>HTTP/1.1</th><th>HTTP/2</th></tr></thead><tbody><tr><td><strong>传输格式</strong></td><td>文本</td><td>二进制分帧</td></tr><tr><td><strong>并发请求</strong></td><td>多连接（6-8个/域名）</td><td>单连接多路复用</td></tr><tr><td><strong>队头阻塞</strong></td><td>存在（应用层）</td><td>解决（Stream 层面）</td></tr><tr><td><strong>头部压缩</strong></td><td>无（Gzip 仅压缩 Body）</td><td>HPACK 压缩</td></tr><tr><td><strong>服务器推送</strong></td><td>不支持</td><td>支持</td></tr><tr><td><strong>优先级</strong></td><td>无</td><td>支持 Stream 优先级</td></tr><tr><td><strong>流量控制</strong></td><td>无</td><td>基于 Stream 的窗口控制</td></tr><tr><td><strong>TLS 要求</strong></td><td>可选</td><td>主流浏览器强制要求</td></tr></tbody></table><h3 id=34-性能提升实测>3.4 性能提升实测</h3><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>┌─────────────────────────────────────────────────────────┐
-</span></span><span class=line><span class=cl>│                    页面加载时间对比                       │
-</span></span><span class=line><span class=cl>├─────────────────────────────────────────────────────────┤
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>│  HTTP/1.1                         HTTP/2                │
-</span></span><span class=line><span class=cl>│  ┌─────────────────┐              ┌────────┐            │
-</span></span><span class=line><span class=cl>│  │█████████████████│              │████████│            │
-</span></span><span class=line><span class=cl>│  │█████████████████│              │████████│            │
-</span></span><span class=line><span class=cl>│  │█████████████████│              └────────┘            │
-</span></span><span class=line><span class=cl>│  │█████████████████│                                    │
-</span></span><span class=line><span class=cl>│  │█████████████████│              1.2s                  │
-</span></span><span class=line><span class=cl>│  │█████████████████│                                    │
-</span></span><span class=line><span class=cl>│  │█████████████████│                                    │
-</span></span><span class=line><span class=cl>│  └─────────────────┘                                    │
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>│       3.8s                                              │
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>│  测试条件：100个资源，模拟 3G 网络                        │
-</span></span><span class=line><span class=cl>│  提升幅度：约 68%                                        │
-</span></span><span class=line><span class=cl>└─────────────────────────────────────────────────────────┘</span></span></code></pre></div></div><hr><h2 id=四https-安全传输>四、HTTPS 安全传输</h2><h3 id=41-为什么需要-https>4.1 为什么需要 HTTPS</h3><p>HTTP 明文传输的风险：</p><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>HTTP 传输（可被窃听）：
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>用户 ──明文密码：123456──► 黑客窃听 ◄── 明文密码：123456 ──► 服务器
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>HTTPS 传输（加密保护）：
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>用户 ──加密：a#9$kL@2...──► 黑客窃听 ◄── 无法解密 ──► 服务器
-</span></span><span class=line><span class=cl>                      （看到的是乱码）</span></span></code></pre></div></div><h3 id=42-https--http--ssltls>4.2 HTTPS = HTTP + SSL/TLS</h3><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>┌─────────────────────────────────────────────────────────┐
-</span></span><span class=line><span class=cl>│                   HTTPS 协议栈                           │
-</span></span><span class=line><span class=cl>├─────────────────────────────────────────────────────────┤
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>│  HTTP 层    ┌─────────────────────────────────────┐     │
-</span></span><span class=line><span class=cl>│             │  HTTP 协议（GET/POST/响应等）          │     │
-</span></span><span class=line><span class=cl>│             └──────────────┬────────────────────────┘     │
-</span></span><span class=line><span class=cl>│                            │                             │
-</span></span><span class=line><span class=cl>│  SSL/TLS 层 ┌──────────────▼────────────────────────┐     │
-</span></span><span class=line><span class=cl>│             │  握手协议    │    记录协议              │     │
-</span></span><span class=line><span class=cl>│             │  (Handshake) │   (Record)              │     │
-</span></span><span class=line><span class=cl>│             │              │                         │     │
-</span></span><span class=line><span class=cl>│             │  • 证书验证   │  • 分段                 │     │
-</span></span><span class=line><span class=cl>│             │  • 密钥交换   │  • 压缩（可选）          │     │
-</span></span><span class=line><span class=cl>│             │  • 算法协商   │  • MAC计算              │     │
-</span></span><span class=line><span class=cl>│             │              │  • 加密                 │     │
-</span></span><span class=line><span class=cl>│             └──────────────┬────────────────────────┘     │
-</span></span><span class=line><span class=cl>│                            │                             │
-</span></span><span class=line><span class=cl>│  传输层    ┌───────────────▼────────────────────────┐     │
-</span></span><span class=line><span class=cl>│             │          TCP 协议                       │     │
-</span></span><span class=line><span class=cl>│             └────────────────────────────────────────┘     │
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>└─────────────────────────────────────────────────────────┘</span></span></code></pre></div></div><h3 id=43-tls-握手过程>4.3 TLS 握手过程</h3><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>TLS 1.2 握手（2-RTT）：
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>客户端                          服务器
-</span></span><span class=line><span class=cl>  │                                │
-</span></span><span class=line><span class=cl>  │ ───── ClientHello ───────────&gt; │  支持的算法列表、随机数
-</span></span><span class=line><span class=cl>  │                                │
-</span></span><span class=line><span class=cl>  │ &lt;──── ServerHello ──────────── │  选定算法、随机数
-</span></span><span class=line><span class=cl>  │ &lt;──── Certificate ──────────── │  服务器证书（公钥）
-</span></span><span class=line><span class=cl>  │ &lt;──── ServerHelloDone ──────── │
-</span></span><span class=line><span class=cl>  │                                │
-</span></span><span class=line><span class=cl>  │ ───── ClientKeyExchange ─────&gt; │  预主密钥（用公钥加密）
-</span></span><span class=line><span class=cl>  │ ───── ChangeCipherSpec ──────&gt; │  切换加密模式
-</span></span><span class=line><span class=cl>  │ ───── Finished ──────────────&gt; │  握手完成验证
-</span></span><span class=line><span class=cl>  │                                │
-</span></span><span class=line><span class=cl>  │ &lt;──── ChangeCipherSpec ─────── │  切换加密模式
-</span></span><span class=line><span class=cl>  │ &lt;──── Finished ─────────────── │  握手完成验证
-</span></span><span class=line><span class=cl>  │                                │
-</span></span><span class=line><span class=cl>  ═══════════════════════════════════════
-</span></span><span class=line><span class=cl>  │  加密通信开始（对称密钥）       │
-</span></span><span class=line><span class=cl>  ═══════════════════════════════════════
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>TLS 1.3 握手（1-RTT，优化）：
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>客户端                          服务器
-</span></span><span class=line><span class=cl>  │                                │
-</span></span><span class=line><span class=cl>  │ ───── ClientHello ───────────&gt; │  密钥份额 + 支持的算法
-</span></span><span class=line><span class=cl>  │      + 密钥份额                 │
-</span></span><span class=line><span class=cl>  │                                │
-</span></span><span class=line><span class=cl>  │ &lt;──── ServerHello ──────────── │  选定算法 + 密钥份额
-</span></span><span class=line><span class=cl>  │ &lt;──── {EncryptedExtensions} ── │  加密扩展（已加密）
-</span></span><span class=line><span class=cl>  │ &lt;──── {Certificate} ────────── │  证书
-</span></span><span class=line><span class=cl>  │ &lt;──── {Finished} ───────────── │  完成
-</span></span><span class=line><span class=cl>  │                                │
-</span></span><span class=line><span class=cl>  │ ───── {Finished} ────────────&gt; │
-</span></span><span class=line><span class=cl>  │                                │
-</span></span><span class=line><span class=cl>  ═══════════════════════════════════════
-</span></span><span class=line><span class=cl>  │  加密通信开始                   │
-</span></span><span class=line><span class=cl>  ═══════════════════════════════════════
-</span></span><span class=line><span class=cl>  
-</span></span><span class=line><span class=cl>  {} 表示加密传输
-</span></span><span class=line><span class=cl>  0-RTT：会话恢复时，首包即可携带数据</span></span></code></pre></div></div><h3 id=44-证书体系>4.4 证书体系</h3><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>┌─────────────────────────────────────────────────────────┐
-</span></span><span class=line><span class=cl>│                  PKI 证书体系                            │
-</span></span><span class=line><span class=cl>├─────────────────────────────────────────────────────────┤
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>│                         ┌─────────┐                      │
-</span></span><span class=line><span class=cl>│                         │  Root CA │  根证书（自签名）     │
-</span></span><span class=line><span class=cl>│                         │ (根证书) │                     │
-</span></span><span class=line><span class=cl>│                         └────┬────┘                      │
-</span></span><span class=line><span class=cl>│                              │ 签名                      │
-</span></span><span class=line><span class=cl>│              ┌───────────────┼───────────────┐          │
-</span></span><span class=line><span class=cl>│              │               │               │          │
-</span></span><span class=line><span class=cl>│         ┌────▼────┐     ┌────▼────┐    ┌────▼────┐     │
-</span></span><span class=line><span class=cl>│         │Intermediate│  │Intermediate│  │Intermediate│   │
-</span></span><span class=line><span class=cl>│         │   CA     │    │   CA     │    │   CA     │    │
-</span></span><span class=line><span class=cl>│         └────┬────┘     └────┬────┘    └────┬────┘    │
-</span></span><span class=line><span class=cl>│              │               │               │         │
-</span></span><span class=line><span class=cl>│         ┌────▼────┐     ┌────▼────┐    ┌────▼────┐    │
-</span></span><span class=line><span class=cl>│         │ 服务器证书 │    │ 服务器证书 │    │ 服务器证书 │   │
-</span></span><span class=line><span class=cl>│         │example.com│   │ blog.com  │   │ shop.com  │   │
-</span></span><span class=line><span class=cl>│         └─────────┘     └─────────┘    └─────────┘    │
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>│  证书链验证：服务器证书 ← 中间 CA ← 根证书                │
-</span></span><span class=line><span class=cl>│  根证书预装在操作系统/浏览器中                            │
-</span></span><span class=line><span class=cl>└─────────────────────────────────────────────────────────┘</span></span></code></pre></div></div><h3 id=45-https-配置示例>4.5 HTTPS 配置示例</h3><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-nginx"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-nginx data-lang=nginx><span class=line><span class=cl><span class=c1># Nginx HTTPS 配置
-</span></span></span><span class=line><span class=cl><span class=k>server</span> <span class=p>{</span>
-</span></span><span class=line><span class=cl>    <span class=kn>listen</span> <span class=mi>443</span> <span class=s>ssl</span> <span class=s>http2</span><span class=p>;</span>           <span class=c1># 启用 HTTP/2
-</span></span></span><span class=line><span class=cl>    <span class=kn>server_name</span> <span class=s>example.com</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>    
-</span></span><span class=line><span class=cl>    <span class=c1># 证书配置
-</span></span></span><span class=line><span class=cl>    <span class=kn>ssl_certificate</span>     <span class=s>/etc/nginx/ssl/example.com.crt</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>    <span class=kn>ssl_certificate_key</span> <span class=s>/etc/nginx/ssl/example.com.key</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>    
-</span></span><span class=line><span class=cl>    <span class=c1># TLS 版本（禁用不安全的 SSLv2/3、TLS 1.0/1.1）
-</span></span></span><span class=line><span class=cl>    <span class=kn>ssl_protocols</span>       <span class=s>TLSv1.2</span> <span class=s>TLSv1.3</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>    
-</span></span><span class=line><span class=cl>    <span class=c1># 加密套件（前向保密）
-</span></span></span><span class=line><span class=cl>    <span class=kn>ssl_ciphers</span>         <span class=s>ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>    <span class=kn>ssl_prefer_server_ciphers</span> <span class=no>on</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>    
-</span></span><span class=line><span class=cl>    <span class=c1># 会话缓存
-</span></span></span><span class=line><span class=cl>    <span class=kn>ssl_session_cache</span>   <span class=s>shared:SSL:10m</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>    <span class=kn>ssl_session_timeout</span> <span class=mi>10m</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>    
-</span></span><span class=line><span class=cl>    <span class=c1># HSTS（强制 HTTPS）
-</span></span></span><span class=line><span class=cl>    <span class=kn>add_header</span> <span class=s>Strict-Transport-Security</span> <span class=s>&#34;max-age=31536000</span><span class=p>;</span> <span class=kn>includeSubDomains&#34;</span> <span class=s>always</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>    
-</span></span><span class=line><span class=cl>    <span class=kn>location</span> <span class=s>/</span> <span class=p>{</span>
-</span></span><span class=line><span class=cl>        <span class=kn>proxy_pass</span> <span class=s>http://backend</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>    <span class=p>}</span>
-</span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl><span class=c1># HTTP 重定向到 HTTPS
-</span></span></span><span class=line><span class=cl><span class=k>server</span> <span class=p>{</span>
-</span></span><span class=line><span class=cl>    <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>    <span class=kn>server_name</span> <span class=s>example.com</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>    <span class=kn>return</span> <span class=mi>301</span> <span class=s>https://</span><span class=nv>$server_name$request_uri</span><span class=p>;</span>
-</span></span><span class=line><span class=cl><span class=p>}</span></span></span></code></pre></div></div><hr><h2 id=五协议对比总结>五、协议对比总结</h2><h3 id=51-功能特性对比>5.1 功能特性对比</h3><table><thead><tr><th>特性</th><th>HTTP/1.1</th><th>HTTP/2</th><th>HTTPS</th></tr></thead><tbody><tr><td><strong>传输安全</strong></td><td>❌ 明文</td><td>❌ 明文</td><td>✅ 加密</td></tr><tr><td><strong>传输效率</strong></td><td>⭐⭐</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐⭐（有加密开销）</td></tr><tr><td><strong>并发能力</strong></td><td>6-8连接/域名</td><td>100+ Stream/连接</td><td>同 HTTP</td></tr><tr><td><strong>队头阻塞</strong></td><td>✅ 存在</td><td>✅ 解决</td><td>同 HTTP</td></tr><tr><td><strong>头部压缩</strong></td><td>❌</td><td>✅ HPACK</td><td>同 HTTP</td></tr><tr><td><strong>服务器推送</strong></td><td>❌</td><td>✅</td><td>同 HTTP</td></tr><tr><td><strong>端口</strong></td><td>80</td><td>80/443</td><td>443</td></tr><tr><td><strong>SEO 友好</strong></td><td>⭐⭐⭐</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐⭐⭐⭐（搜索引擎偏好）</td></tr></tbody></table><h3 id=52-演进关系>5.2 演进关系</h3><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>HTTP/1.0 (1996)
-</span></span><span class=line><span class=cl>    │
-</span></span><span class=line><span class=cl>    ├── Connection: keep-alive（非标准）
-</span></span><span class=line><span class=cl>    │
-</span></span><span class=line><span class=cl>HTTP/1.1 (1997/2014)
-</span></span><span class=line><span class=cl>    │
-</span></span><span class=line><span class=cl>    ├── 持久连接（标准）
-</span></span><span class=line><span class=cl>    ├── 管道化
-</span></span><span class=line><span class=cl>    ├── 分块传输
-</span></span><span class=line><span class=cl>    └── 缓存控制增强
-</span></span><span class=line><span class=cl>    │
-</span></span><span class=line><span class=cl>HTTPS = HTTP + SSL/TLS
-</span></span><span class=line><span class=cl>    │
-</span></span><span class=line><span class=cl>    ├── TLS 1.0/1.1 (已弃用)
-</span></span><span class=line><span class=cl>    ├── TLS 1.2 (主流)
-</span></span><span class=line><span class=cl>    └── TLS 1.3 (最新)
-</span></span><span class=line><span class=cl>    │
-</span></span><span class=line><span class=cl>HTTP/2 (2015)
-</span></span><span class=line><span class=cl>    │
-</span></span><span class=line><span class=cl>    ├── 基于 HTTPS（主流浏览器要求）
-</span></span><span class=line><span class=cl>    ├── 二进制分帧
-</span></span><span class=line><span class=cl>    ├── 多路复用
-</span></span><span class=line><span class=cl>    ├── 头部压缩
-</span></span><span class=line><span class=cl>    └── 服务器推送
-</span></span><span class=line><span class=cl>    │
-</span></span><span class=line><span class=cl>HTTP/3 (2022)
-</span></span><span class=line><span class=cl>    │
-</span></span><span class=line><span class=cl>    └── 基于 QUIC（UDP）替代 TCP</span></span></code></pre></div></div><h3 id=53-现代-web-推荐配置>5.3 现代 Web 推荐配置</h3><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>┌─────────────────────────────────────────────────────────┐
-</span></span><span class=line><span class=cl>│              2026 年推荐 Web 协议配置                     │
-</span></span><span class=line><span class=cl>├─────────────────────────────────────────────────────────┤
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>│  ✅ 强制 HTTPS（HSTS）                                   │
-</span></span><span class=line><span class=cl>│     • 所有 HTTP 流量 301 重定向到 HTTPS                   │
-</span></span><span class=line><span class=cl>│     • 启用 HSTS 头部（max-age ≥ 1年）                    │
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>│  ✅ 启用 HTTP/2 或 HTTP/3                                │
-</span></span><span class=line><span class=cl>│     • Nginx/Apache 开启 http2 模块                       │
-</span></span><span class=line><span class=cl>│     • 使用 TLS 1.2+（禁用 1.0/1.1）                      │
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>│  ✅ 安全配置                                             │
-</span></span><span class=line><span class=cl>│     • 使用 Let&#39;s Encrypt 免费证书                         │
-</span></span><span class=line><span class=cl>│     • 启用 OCSP Stapling                                 │
-</span></span><span class=line><span class=cl>│     • 配置 CSP（内容安全策略）                            │
-</span></span><span class=line><span class=cl>│                                                          │
-</span></span><span class=line><span class=cl>│  ❌ 避免                                                 │
-</span></span><span class=line><span class=cl>│     • 混合内容（HTTPS 页面加载 HTTP 资源）                │
-</span></span><span class=line><span class=cl>│     • 过时的 TLS 版本（1.0/1.1）                          │
-</span></span><span class=line><span class=cl>│     • 弱加密套件                                         │
-</span></span><span class=line><span class=cl>└─────────────────────────────────────────────────────────┘</span></span></code></pre></div></div><h3 id=54-调试工具>5.4 调试工具</h3><div class="code-block code-line-numbers open" style="counter-reset:code-block 0"><div class="code-header language-bash"><span class=code-title><i class="arrow fas fa-angle-right" aria-hidden=true></i></span>
-<span class=ellipses><i class="fas fa-ellipsis-h" aria-hidden=true></i></span>
-<span class=copy title=复制到剪贴板><i class="far fa-copy" aria-hidden=true></i></span></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 检查 HTTP 版本</span>
-</span></span><span class=line><span class=cl>$ curl -I --http2 https://example.com
-</span></span><span class=line><span class=cl>HTTP/2 <span class=m>200</span>
-</span></span><span class=line><span class=cl>server: nginx/1.18.0
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl><span class=c1># 查看 TLS 握手详情</span>
-</span></span><span class=line><span class=cl>$ openssl s_client -connect example.com:443 -tls1_3
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl><span class=c1># 性能测试（HTTP/1.1 vs HTTP/2）</span>
-</span></span><span class=line><span class=cl>$ h2load -n1000 -c100 -m10 https://example.com
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl><span class=c1># 浏览器开发者工具</span>
-</span></span><span class=line><span class=cl><span class=c1># Network → Protocol 列显示 h2/http/1.1</span></span></span></code></pre></div></div><hr><h2 id=六常见问题>六、常见问题</h2><h3 id=q1-http2-比-http11-快多少>Q1: HTTP/2 比 HTTP/1.1 快多少？</h3><p><strong>A</strong>: 在高延迟网络下可提升 50-70%，实际取决于资源数量和大小。</p><h3 id=q2-为什么-http2-要求-https>Q2: 为什么 HTTP/2 要求 HTTPS？</h3><p><strong>A</strong>: 主流浏览器（Chrome/Firefox）强制要求，防止中间人攻击和兼容性问题。</p><h3 id=q3-http3-和-http2-的区别>Q3: HTTP/3 和 HTTP/2 的区别？</h3><p><strong>A</strong>: HTTP/3 基于 QUIC（UDP）替代 TCP，解决 TCP 队头阻塞，更适合移动网络。</p><h3 id=q4-如何迁移到-https>Q4: 如何迁移到 HTTPS？</h3><p><strong>A</strong>: 1) 申请 SSL 证书 2) 配置服务器 3) 301 重定向 4) 更新内部链接 5) 提交搜索引擎。</p><hr><p><strong>参考资源：</strong></p><ul><li><a href=https://tools.ietf.org/html/rfc2616 target=_blank rel="noopener noreffer">RFC 2616 - HTTP/1.1</a></li><li><a href=https://tools.ietf.org/html/rfc7540 target=_blank rel="noopener noreffer">RFC 7540 - HTTP/2</a></li><li><a href=https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Overview target=_blank rel="noopener noreffer">MDN - HTTP 概述</a></li><li><a href=https://www.ssllabs.com/ssltest/ target=_blank rel="noopener noreffer">SSL Labs 测试</a></li></ul></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>更新于 2026-04-10</span></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span><a href=javascript:void(0); title="分享到 X" data-sharer=x data-url=https://ksmaple.github.io/posts/http-protocols-guide/ data-title="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS" data-hashtags=HTTP,HTTPS,网络协议,Web性能,HTTP2><i class="fab fa-x-twitter" aria-hidden=true></i></a><a href=javascript:void(0); title="分享到 Threads" data-sharer=threads data-url=https://ksmaple.github.io/posts/http-protocols-guide/ data-title="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS"><i class="fab fa-threads" aria-hidden=true></i></a><a href=javascript:void(0); title="分享到 Facebook" data-sharer=facebook data-url=https://ksmaple.github.io/posts/http-protocols-guide/ data-hashtag=HTTP><i class="fab fa-facebook-square" aria-hidden=true></i></a><a href=javascript:void(0); title="分享到 Hacker News" data-sharer=hackernews data-url=https://ksmaple.github.io/posts/http-protocols-guide/ data-title="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS"><i class="fab fa-hacker-news" aria-hidden=true></i></a><a href=javascript:void(0); title="分享到 Line" data-sharer=line data-url=https://ksmaple.github.io/posts/http-protocols-guide/ data-title="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS"><i data-svg-src=https://cdn.jsdelivr.net/npm/simple-icons@16.9.0/icons/line.svg aria-hidden=true></i></a><a href=javascript:void(0); title="分享到 微博" data-sharer=weibo data-url=https://ksmaple.github.io/posts/http-protocols-guide/ data-title="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS" data-image=/images/covers/cover-04.jpg><i class="fab fa-weibo" aria-hidden=true></i></a><a href=javascript:void(0); title="分享到 Diaspora" data-sharer=diaspora data-url=https://ksmaple.github.io/posts/http-protocols-guide/ data-title="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS" data-description><i class="fab fa-diaspora" aria-hidden=true></i></a><a href="https://t.me/share/url?url=https%3a%2f%2fksmaple.github.io%2fposts%2fhttp-protocols-guide%2f&amp;text=HTTP%20%e5%8d%8f%e8%ae%ae%e6%bc%94%e8%bf%9b%ef%bc%9a%e4%bb%8e%20HTTP%2f1.1%20%e5%88%b0%20HTTP%2f2%20%e4%b8%8e%20HTTPS" target=_blank title="分享到 Telegram"><i class="fab fa-telegram" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags" aria-hidden=true></i>&nbsp;<a href=/tags/http/>HTTP</a>,&nbsp;<a href=/tags/https/>HTTPS</a>,&nbsp;<a href=/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/>网络协议</a>,&nbsp;<a href=/tags/web%E6%80%A7%E8%83%BD/>Web性能</a>,&nbsp;<a href=/tags/http2/>HTTP2</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span></section></div><div class=post-nav><a href=/posts/java-web-frameworks-comparison/ class=prev rel=prev title="Java Web 技术演进：从 Servlet 到 Spring MVC 与阿里 ROP 全面对比"><i class="fas fa-angle-left" aria-hidden=true></i>Java Web 技术演进：从 Servlet 到 Spring MVC 与阿里 ROP 全面对比</a></div></div><div id=comments><div id=utterances class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://utteranc.es/>utterances</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright" aria-hidden=true></i><span itemprop=copyrightYear>2020 - 2026</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=/ target=_blank>咔咔</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title=回到顶部><i class="fas fa-arrow-up" aria-hidden=true></i></a></div><div id=fixed-buttons-hidden><a href=# id=view-comments class=fixed-button title=查看评论><i class="fas fa-comment" aria-hidden=true></i></a></div><script src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js></script><script src=https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js></script><script src=/lib/lunr/lunr.stemmer.support.min.js></script><script src=/lib/lunr/lunr.zh.min.js></script><script src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js></script><script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js></script><script src=https://cdn.jsdelivr.net/npm/sharer.js@0.5.2/sharer.min.js></script><script>window.config={comment:{utterances:{darkTheme:"github-dark",issueTerm:"pathname",label:"comment",lightTheme:"github-light",repo:"ksmaple/ksmaple.github.io"}},search:{highlightTag:"em",lunrIndexURL:"/index.json",lunrLanguageCode:"zh",lunrSegmentitURL:"/lib/lunr/lunr.segmentit.js",maxResultLength:10,noResultsFound:"没有找到结果",snippetLength:50,type:"lunr"}}</script><script src=/js/theme.js></script></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS - 咔咔不太卡的博客</title><meta name="Description" content="技术博客，记录学习与生活"><meta property="og:title" content="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS - 咔咔不太卡的博客" />
+<meta property="og:description" content="技术博客，记录学习与生活" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/http-protocols-guide/" />
+    <meta property="article:published_time" content="2026-04-10T18:00:00&#43;08:00" />
+    <meta property="article:modified_time" content="2026-04-10T18:00:00&#43;08:00" />
+    <meta property="article:tag" content="HTTP" />
+    <meta property="article:tag" content="HTTPS" />
+    <meta property="article:tag" content="网络协议" />
+    <meta property="article:tag" content="Web性能" />
+    <meta property="article:tag" content="HTTP2" />
+<meta name="twitter:title" content="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS - 咔咔不太卡的博客"/>
+<meta name="twitter:description" content="技术博客，记录学习与生活"/><meta name="twitter:card" content="summary"/>
+<meta name="application-name" content="咔咔不太卡的技术博客">
+<meta name="apple-mobile-web-app-title" content="咔咔不太卡的技术博客">
+<meta name="referrer" content="no-referrer" /><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="icon" href="/favicon.svg"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://localhost:1313/posts/http-protocols-guide/" /><link rel="prev" href="http://localhost:1313/posts/java-web-frameworks-comparison/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/css/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/localhost:1313\/posts\/http-protocols-guide\/"
+        },"genre": "posts","keywords": "HTTP, HTTPS, 网络协议, Web性能, HTTP2","wordcount":  1540 ,
+        "url": "http:\/\/localhost:1313\/posts\/http-protocols-guide\/","datePublished": "2026-04-10T18:00:00+08:00","dateModified": "2026-04-10T18:00:00+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "咔咔"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script>
+          const query = window.matchMedia('(prefers-color-scheme: dark)');
+          function applyTheme() {
+            let theme = window.localStorage?.getItem('theme') || 'auto';
+            let isDark = theme === 'dark' || (theme === 'auto' && query.matches);
+            document.body.setAttribute('theme', isDark? 'dark' : 'light');
+            document.body.setAttribute('cfg-theme', theme);
+          }
+
+          applyTheme();
+          query.addEventListener('change', applyTheme);
+        </script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="咔咔不太卡的博客">咔咔不太卡的技术博客</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/tech-stack/"> 技术栈 </a><a class="menu-item" href="/about/"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="咔咔不太卡的博客">咔咔不太卡的技术博客</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/tech-stack/" title="">技术栈</a><a class="menu-item" href="/about/" title="">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">目录</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS</h1><h2 class="single-subtitle">深入解析 HTTP/1.1、HTTP/2 与 HTTPS 的核心概念与性能差异</h2><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle" aria-hidden="true"></i>咔咔</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/"><i class="far fa-folder" aria-hidden="true"></i>基础知识</a>&nbsp;<a href="/categories/%E7%BD%91%E7%BB%9C/"><i class="far fa-folder" aria-hidden="true"></i>网络</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt" aria-hidden="true"></i>&nbsp;<time datetime="2026-04-10">2026-04-10</time>&nbsp;<i class="fas fa-pencil-alt" aria-hidden="true"></i>&nbsp;约 1540 字&nbsp;
+                <i class="far fa-clock" aria-hidden="true"></i>&nbsp;预计阅读 8 分钟&nbsp;</div>
+        </div><div class="featured-image"><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/images/covers/cover-04.jpg"
+        data-srcset="/images/covers/cover-04.jpg, /images/covers/cover-04.jpg 1.5x, /images/covers/cover-04.jpg 2x"
+        data-sizes="auto"
+        alt="/images/covers/cover-04.jpg"
+        title="/images/covers/cover-04.jpg" /></div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#一http-基础概念">一、HTTP 基础概念</a>
+      <ul>
+        <li><a href="#11-什么是-http">1.1 什么是 HTTP</a></li>
+        <li><a href="#12-http-工作模式">1.2 HTTP 工作模式</a></li>
+      </ul>
+    </li>
+    <li><a href="#二http11-详解">二、HTTP/1.1 详解</a>
+      <ul>
+        <li><a href="#21-http11-核心特性">2.1 HTTP/1.1 核心特性</a></li>
+        <li><a href="#22-http11-请求报文">2.2 HTTP/1.1 请求报文</a></li>
+        <li><a href="#23-http11-响应报文">2.3 HTTP/1.1 响应报文</a></li>
+        <li><a href="#24-常见状态码">2.4 常见状态码</a></li>
+      </ul>
+    </li>
+    <li><a href="#三http2-革命性升级">三、HTTP/2 革命性升级</a>
+      <ul>
+        <li><a href="#31-为什么需要-http2">3.1 为什么需要 HTTP/2</a></li>
+        <li><a href="#32-http2-核心特性">3.2 HTTP/2 核心特性</a></li>
+        <li><a href="#33-http2-与-http11-对比">3.3 HTTP/2 与 HTTP/1.1 对比</a></li>
+        <li><a href="#34-性能提升实测">3.4 性能提升实测</a></li>
+      </ul>
+    </li>
+    <li><a href="#四https-安全传输">四、HTTPS 安全传输</a>
+      <ul>
+        <li><a href="#41-为什么需要-https">4.1 为什么需要 HTTPS</a></li>
+        <li><a href="#42-https--http--ssltls">4.2 HTTPS = HTTP + SSL/TLS</a></li>
+        <li><a href="#43-tls-握手过程">4.3 TLS 握手过程</a></li>
+        <li><a href="#44-证书体系">4.4 证书体系</a></li>
+        <li><a href="#45-https-配置示例">4.5 HTTPS 配置示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#五协议对比总结">五、协议对比总结</a>
+      <ul>
+        <li><a href="#51-功能特性对比">5.1 功能特性对比</a></li>
+        <li><a href="#52-演进关系">5.2 演进关系</a></li>
+        <li><a href="#53-现代-web-推荐配置">5.3 现代 Web 推荐配置</a></li>
+        <li><a href="#54-调试工具">5.4 调试工具</a></li>
+      </ul>
+    </li>
+    <li><a href="#六常见问题">六、常见问题</a>
+      <ul>
+        <li><a href="#q1-http2-比-http11-快多少">Q1: HTTP/2 比 HTTP/1.1 快多少？</a></li>
+        <li><a href="#q2-为什么-http2-要求-https">Q2: 为什么 HTTP/2 要求 HTTPS？</a></li>
+        <li><a href="#q3-http3-和-http2-的区别">Q3: HTTP/3 和 HTTP/2 的区别？</a></li>
+        <li><a href="#q4-如何迁移到-https">Q4: 如何迁移到 HTTPS？</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>HTTP（超文本传输协议）是 Web 的基石。本文将深入解析 HTTP/1.1、HTTP/2 和 HTTPS 的核心概念、演进历程及性能差异。</p>
+<h2 id="一http-基础概念">一、HTTP 基础概念</h2>
+<h3 id="11-什么是-http">1.1 什么是 HTTP</h3>
+<p>HTTP（HyperText Transfer Protocol）是应用层协议，基于 TCP/IP 通信，用于客户端（浏览器）与服务器之间的数据传输。</p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">┌─────────────────────────────────────────────────────────┐
+</span></span><span class="line"><span class="cl">│                      OSI 七层模型                         │
+</span></span><span class="line"><span class="cl">├─────────────────────────────────────────────────────────┤
+</span></span><span class="line"><span class="cl">│  应用层  │  HTTP / HTTPS / FTP / SMTP                    │
+</span></span><span class="line"><span class="cl">│  表示层  │  SSL / TLS / 加密编码                          │
+</span></span><span class="line"><span class="cl">│  会话层  │  NetBIOS / RPC                                │
+</span></span><span class="line"><span class="cl">│  传输层  │  TCP / UDP                                     │
+</span></span><span class="line"><span class="cl">│  网络层  │  IP / ICMP / 路由协议                          │
+</span></span><span class="line"><span class="cl">│ 数据链路层│  Ethernet / ARP / MAC                         │
+</span></span><span class="line"><span class="cl">│  物理层  │  网线 / 光纤 / 无线信号                         │
+</span></span><span class="line"><span class="cl">└─────────────────────────────────────────────────────────┘</span></span></code></pre></div></div>
+<h3 id="12-http-工作模式">1.2 HTTP 工作模式</h3>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">客户端（浏览器）              服务器（Nginx/Apache）
+</span></span><span class="line"><span class="cl">     │                              │
+</span></span><span class="line"><span class="cl">     │  1. 建立 TCP 连接（三次握手）   │
+</span></span><span class="line"><span class="cl">     │ ─────────────────────────────&gt;│
+</span></span><span class="line"><span class="cl">     │                              │
+</span></span><span class="line"><span class="cl">     │  2. 发送 HTTP Request         │
+</span></span><span class="line"><span class="cl">     │     GET /index.html HTTP/1.1  │
+</span></span><span class="line"><span class="cl">     │     Host: example.com         │
+</span></span><span class="line"><span class="cl">     │     User-Agent: Chrome/91     │
+</span></span><span class="line"><span class="cl">     │ ─────────────────────────────&gt;│
+</span></span><span class="line"><span class="cl">     │                              │
+</span></span><span class="line"><span class="cl">     │  3. 返回 HTTP Response        │
+</span></span><span class="line"><span class="cl">     │     HTTP/1.1 200 OK           │
+</span></span><span class="line"><span class="cl">     │     Content-Type: text/html   │
+</span></span><span class="line"><span class="cl">     │     &lt;html&gt;...&lt;/html&gt;          │
+</span></span><span class="line"><span class="cl">     │&lt;───────────────────────────── │
+</span></span><span class="line"><span class="cl">     │                              │
+</span></span><span class="line"><span class="cl">     │  4. 关闭连接（四次挥手）        │
+</span></span><span class="line"><span class="cl">     │ ─────────────────────────────&gt;│</span></span></code></pre></div></div>
+<hr>
+<h2 id="二http11-详解">二、HTTP/1.1 详解</h2>
+<h3 id="21-http11-核心特性">2.1 HTTP/1.1 核心特性</h3>
+<p>HTTP/1.1 于 1997 年发布（RFC 2068），是目前最广泛使用的版本。</p>
+<h4 id="持久连接persistent-connection">持久连接（Persistent Connection）</h4>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-http">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="cl"><span class="err"># HTTP/1.0 每次请求新建连接
+</span></span></span><span class="line"><span class="cl"><span class="nf">GET</span> <span class="nn">/page1.html</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span>
+</span></span><span class="line"><span class="cl"><span class="n">Connection</span><span class="o">:</span> <span class="l">close</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="g"># HTTP/1.1 默认持久连接
+</span></span></span><span class="line"><span class="cl"><span class="g">GET /page1.html HTTP/1.1
+</span></span></span><span class="line"><span class="cl"><span class="g">Host: example.com
+</span></span></span><span class="line"><span class="cl"><span class="g">Connection: keep-alive
+</span></span></span><span class="line"><span class="cl"><span class="g">
+</span></span></span><span class="line"><span class="cl"><span class="g">GET /page2.html HTTP/1.1  # 复用同一连接
+</span></span></span><span class="line"><span class="cl"><span class="g">Host: example.com</span></span></span></code></pre></div></div>
+<h4 id="管道化pipelining">管道化（Pipelining）</h4>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">HTTP/1.0 串行请求：          HTTP/1.1 管道化：
+</span></span><span class="line"><span class="cl">                              
+</span></span><span class="line"><span class="cl">请求1 ──► 响应1               请求1 ──►
+</span></span><span class="line"><span class="cl">请求2 ──► 响应2               请求2 ──►
+</span></span><span class="line"><span class="cl">请求3 ──► 响应3               请求3 ──►
+</span></span><span class="line"><span class="cl">                              ◄── 响应1
+</span></span><span class="line"><span class="cl">                              ◄── 响应2
+</span></span><span class="line"><span class="cl">                              ◄── 响应3</span></span></code></pre></div></div>
+<p><strong>注意</strong>：HTTP/1.1 管道化存在**队头阻塞（Head-of-Line Blocking）**问题——一个请求阻塞，后续请求必须等待。</p>
+<h3 id="22-http11-请求报文">2.2 HTTP/1.1 请求报文</h3>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-http">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="cl"><span class="err">GET /api/users?page=1 HTTP/1.1           ← 请求行（方法 + URI + 版本）
+</span></span></span><span class="line"><span class="cl"><span class="err">Host: api.example.com                    ← 必需头部
+</span></span></span><span class="line"><span class="cl"><span class="err">Accept: application/json                 ← 接受的数据格式
+</span></span></span><span class="line"><span class="cl"><span class="err">Accept-Encoding: gzip, deflate           ← 接受的压缩方式
+</span></span></span><span class="line"><span class="cl"><span class="err">Accept-Language: zh-CN,zh;q=0.9,en;q=0.8 ← 语言偏好
+</span></span></span><span class="line"><span class="cl"><span class="err">Connection: keep-alive                   ← 连接管理
+</span></span></span><span class="line"><span class="cl"><span class="err">Cache-Control: no-cache                  ← 缓存控制
+</span></span></span><span class="line"><span class="cl"><span class="err">Authorization: Bearer eyJhbG...          ← 认证信息
+</span></span></span><span class="line"><span class="cl"><span class="err">Cookie: sessionId=abc123                 ← Cookie
+</span></span></span><span class="line"><span class="cl"><span class="err">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)  ← 客户端标识
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">                                         ← 空行
+</span></span></span><span class="line"><span class="cl"><span class="err">{&#34;name&#34;:&#34;张三&#34;}                          ← 请求体（POST/PUT 时）</span></span></span></code></pre></div></div>
+<h3 id="23-http11-响应报文">2.3 HTTP/1.1 响应报文</h3>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-http">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-http" data-lang="http"><span class="line"><span class="cl"><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK                          ← 状态行（版本 + 状态码 + 原因）</span>
+</span></span><span class="line"><span class="cl"><span class="n">Date</span><span class="o">:</span> <span class="l">Mon, 23 May 2024 22:38:34 GMT      ← 服务器时间</span>
+</span></span><span class="line"><span class="cl"><span class="n">Content-Type</span><span class="o">:</span> <span class="l">application/json           ← 内容类型</span>
+</span></span><span class="line"><span class="cl"><span class="n">Content-Length</span><span class="o">:</span> <span class="l">1234                     ← 内容长度</span>
+</span></span><span class="line"><span class="cl"><span class="n">Content-Encoding</span><span class="o">:</span> <span class="l">gzip                   ← 压缩方式</span>
+</span></span><span class="line"><span class="cl"><span class="n">Cache-Control</span><span class="o">:</span> <span class="l">max-age=3600              ← 缓存策略</span>
+</span></span><span class="line"><span class="cl"><span class="n">ETag</span><span class="o">:</span> <span class="l">&#34;33a64df5&#34;                         ← 资源标识（用于缓存验证）</span>
+</span></span><span class="line"><span class="cl"><span class="n">Set-Cookie</span><span class="o">:</span> <span class="l">sessionId=xyz789; Path=/     ← 设置 Cookie</span>
+</span></span><span class="line"><span class="cl"><span class="n">Server</span><span class="o">:</span> <span class="l">nginx/1.18.0                     ← 服务器软件</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                                         ← 空行
+</span></span><span class="line"><span class="cl">{&#34;id&#34;:1,&#34;name&#34;:&#34;张三&#34;,&#34;age&#34;:25}          ← 响应体</span></span></code></pre></div></div>
+<h3 id="24-常见状态码">2.4 常见状态码</h3>
+<table>
+  <thead>
+      <tr>
+          <th>类别</th>
+          <th>状态码</th>
+          <th>含义</th>
+          <th>场景</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>1xx</strong></td>
+          <td>100</td>
+          <td>Continue</td>
+          <td>客户端应继续请求</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>101</td>
+          <td>Switching Protocols</td>
+          <td>协议升级（如 WebSocket）</td>
+      </tr>
+      <tr>
+          <td><strong>2xx</strong></td>
+          <td>200</td>
+          <td>OK</td>
+          <td>请求成功</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>201</td>
+          <td>Created</td>
+          <td>资源创建成功</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>204</td>
+          <td>No Content</td>
+          <td>成功但无返回内容</td>
+      </tr>
+      <tr>
+          <td><strong>3xx</strong></td>
+          <td>301</td>
+          <td>Moved Permanently</td>
+          <td>永久重定向</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>302</td>
+          <td>Found</td>
+          <td>临时重定向</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>304</td>
+          <td>Not Modified</td>
+          <td>使用缓存版本</td>
+      </tr>
+      <tr>
+          <td><strong>4xx</strong></td>
+          <td>400</td>
+          <td>Bad Request</td>
+          <td>请求参数错误</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>401</td>
+          <td>Unauthorized</td>
+          <td>未认证</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>403</td>
+          <td>Forbidden</td>
+          <td>无权限</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>404</td>
+          <td>Not Found</td>
+          <td>资源不存在</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>429</td>
+          <td>Too Many Requests</td>
+          <td>请求过于频繁</td>
+      </tr>
+      <tr>
+          <td><strong>5xx</strong></td>
+          <td>500</td>
+          <td>Internal Server Error</td>
+          <td>服务器内部错误</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>502</td>
+          <td>Bad Gateway</td>
+          <td>网关错误</td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>503</td>
+          <td>Service Unavailable</td>
+          <td>服务不可用</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="三http2-革命性升级">三、HTTP/2 革命性升级</h2>
+<h3 id="31-为什么需要-http2">3.1 为什么需要 HTTP/2</h3>
+<p>HTTP/1.1 的性能瓶颈：</p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">┌─────────────────────────────────────────────────────────┐
+</span></span><span class="line"><span class="cl">│                 HTTP/1.1 队头阻塞问题                     │
+</span></span><span class="line"><span class="cl">├─────────────────────────────────────────────────────────┤
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">│  请求1: /index.html  ◄────── 响应慢（大文件）             │
+</span></span><span class="line"><span class="cl">│     │                        │                          │
+</span></span><span class="line"><span class="cl">│     │  阻塞                  │                          │
+</span></span><span class="line"><span class="cl">│     ▼                        ▼                          │
+</span></span><span class="line"><span class="cl">│  请求2: /style.css   ◄────── 必须等待请求1完成            │
+</span></span><span class="line"><span class="cl">│     │                        │                          │
+</span></span><span class="line"><span class="cl">│     │  阻塞                  │                          │
+</span></span><span class="line"><span class="cl">│     ▼                        ▼                          │
+</span></span><span class="line"><span class="cl">│  请求3: /app.js      ◄────── 必须等待请求2完成            │
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">│  解决方案：开多个 TCP 连接（6-8个/域名）                   │
+</span></span><span class="line"><span class="cl">│  新问题：连接数过多、TCP 慢启动、竞争带宽                   │
+</span></span><span class="line"><span class="cl">└─────────────────────────────────────────────────────────┘</span></span></code></pre></div></div>
+<h3 id="32-http2-核心特性">3.2 HTTP/2 核心特性</h3>
+<h4 id="二进制分帧层binary-framing">二进制分帧层（Binary Framing）</h4>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">HTTP</span><span class="o">/</span><span class="mf">1.1</span><span class="p">:</span> <span class="err">文本协议</span>            <span class="n">HTTP</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span> <span class="err">二进制协议</span>
+</span></span><span class="line"><span class="cl">                                
+</span></span><span class="line"><span class="cl"><span class="n">GET</span> <span class="o">/</span> <span class="n">HTTP</span><span class="o">/</span><span class="mf">1.1</span>               <span class="err">┌────────────────────────┐</span>
+</span></span><span class="line"><span class="cl"><span class="n">Host</span><span class="p">:</span> <span class="n">example</span><span class="o">.</span><span class="n">com</span>            <span class="err">│</span> <span class="n">Length</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span> <span class="err">│</span> <span class="n">Type</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>  <span class="err">│</span>
+</span></span><span class="line"><span class="cl">                              <span class="err">│</span> <span class="n">Flags</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>   <span class="err">│</span> <span class="n">Reserve</span>  <span class="err">│</span>
+</span></span><span class="line"><span class="cl">                              <span class="err">│</span> <span class="n">Stream</span> <span class="n">Identifier</span><span class="p">(</span><span class="mi">31</span><span class="p">)</span>  <span class="err">│</span>
+</span></span><span class="line"><span class="cl">                              <span class="err">│</span> <span class="n">Payload</span>               <span class="err">│</span>
+</span></span><span class="line"><span class="cl">                              <span class="err">└────────────────────────┘</span>
+</span></span><span class="line"><span class="cl">                              
+</span></span><span class="line"><span class="cl">                              <span class="err">帧类型：</span><span class="n">HEADERS</span><span class="err">、</span><span class="n">DATA</span><span class="err">、</span><span class="n">SETTINGS</span><span class="err">、</span>
+</span></span><span class="line"><span class="cl">                                     <span class="n">PRIORITY</span><span class="err">、</span><span class="n">RST_STREAM</span><span class="err">、</span>
+</span></span><span class="line"><span class="cl">                                     <span class="n">PING</span><span class="err">、</span><span class="n">GOAWAY</span><span class="err">、</span><span class="n">WINDOW_UPDATE</span></span></span></code></pre></div></div>
+<h4 id="多路复用multiplexing">多路复用（Multiplexing）</h4>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">HTTP/1.1（6个连接）            HTTP/2（1个连接）
+</span></span><span class="line"><span class="cl">                                
+</span></span><span class="line"><span class="cl">连接1: index.html             连接:
+</span></span><span class="line"><span class="cl">连接2: style.css                    ┌─────────┐
+</span></span><span class="line"><span class="cl">连接3: app.js                       │ Stream1 │ index.html
+</span></span><span class="line"><span class="cl">连接4: logo.png                     │ Stream3 │ style.css
+</span></span><span class="line"><span class="cl">连接5: api/data                     │ Stream5 │ app.js
+</span></span><span class="line"><span class="cl">连接6: api/user                     │ Stream7 │ logo.png
+</span></span><span class="line"><span class="cl">                                    │ Stream9 │ api/data
+</span></span><span class="line"><span class="cl">                                    │ Stream11│ api/user
+</span></span><span class="line"><span class="cl">                                    └─────────┘
+</span></span><span class="line"><span class="cl">                                    
+</span></span><span class="line"><span class="cl">     6个 TCP 连接               1个 TCP 连接 + 多个 Stream</span></span></code></pre></div></div>
+<h4 id="头部压缩hpack">头部压缩（HPACK）</h4>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">HTTP/1.1 每次请求都发完整头部：      HTTP/2 HPACK 动态表压缩：
+</span></span><span class="line"><span class="cl">                                    
+</span></span><span class="line"><span class="cl">请求1:                              动态表：
+</span></span><span class="line"><span class="cl">Host: example.com                  62: Host: example.com
+</span></span><span class="line"><span class="cl">Accept: */*                        63: Accept: */*
+</span></span><span class="line"><span class="cl">Accept-Encoding: gzip, br          64: Accept-Encoding: gzip, br
+</span></span><span class="line"><span class="cl">Cache-Control: no-cache            65: Cache-Control: no-cache
+</span></span><span class="line"><span class="cl">                                    
+</span></span><span class="line"><span class="cl">请求2（完全重复）：                  请求2（仅需发送索引）：
+</span></span><span class="line"><span class="cl">Host: example.com                  62 63 64 65
+</span></span><span class="line"><span class="cl">Accept: */*
+</span></span><span class="line"><span class="cl">Accept-Encoding: gzip, br
+</span></span><span class="line"><span class="cl">Cache-Control: no-cache
+</span></span><span class="line"><span class="cl">                                    
+</span></span><span class="line"><span class="cl">节省约 80% 头部流量！</span></span></code></pre></div></div>
+<h4 id="服务器推送server-push">服务器推送（Server Push）</h4>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">传统方式：                      HTTP/2 服务器推送：
+</span></span><span class="line"><span class="cl">                                
+</span></span><span class="line"><span class="cl">浏览器 ──GET /index.html──►    浏览器 ──GET /index.html──►
+</span></span><span class="line"><span class="cl">◄────────HTML─────────────      ◄────────HTML─────────────
+</span></span><span class="line"><span class="cl">解析 HTML                       服务器预测需要：
+</span></span><span class="line"><span class="cl">  │                            主动推送 style.css
+</span></span><span class="line"><span class="cl">  ├──GET /style.css───►        主动推送 app.js
+</span></span><span class="line"><span class="cl">  │                             
+</span></span><span class="line"><span class="cl">◄─────CSS───────────────       浏览器 ──GET /logo.png───►
+</span></span><span class="line"><span class="cl">  │                            ◄────────PNG──────────────
+</span></span><span class="line"><span class="cl">  ├──GET /app.js──────►
+</span></span><span class="line"><span class="cl">  │
+</span></span><span class="line"><span class="cl">◄─────JS────────────────
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">往返次数：3次                   往返次数：2次</span></span></code></pre></div></div>
+<h3 id="33-http2-与-http11-对比">3.3 HTTP/2 与 HTTP/1.1 对比</h3>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>HTTP/1.1</th>
+          <th>HTTP/2</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>传输格式</strong></td>
+          <td>文本</td>
+          <td>二进制分帧</td>
+      </tr>
+      <tr>
+          <td><strong>并发请求</strong></td>
+          <td>多连接（6-8个/域名）</td>
+          <td>单连接多路复用</td>
+      </tr>
+      <tr>
+          <td><strong>队头阻塞</strong></td>
+          <td>存在（应用层）</td>
+          <td>解决（Stream 层面）</td>
+      </tr>
+      <tr>
+          <td><strong>头部压缩</strong></td>
+          <td>无（Gzip 仅压缩 Body）</td>
+          <td>HPACK 压缩</td>
+      </tr>
+      <tr>
+          <td><strong>服务器推送</strong></td>
+          <td>不支持</td>
+          <td>支持</td>
+      </tr>
+      <tr>
+          <td><strong>优先级</strong></td>
+          <td>无</td>
+          <td>支持 Stream 优先级</td>
+      </tr>
+      <tr>
+          <td><strong>流量控制</strong></td>
+          <td>无</td>
+          <td>基于 Stream 的窗口控制</td>
+      </tr>
+      <tr>
+          <td><strong>TLS 要求</strong></td>
+          <td>可选</td>
+          <td>主流浏览器强制要求</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="34-性能提升实测">3.4 性能提升实测</h3>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">┌─────────────────────────────────────────────────────────┐
+</span></span><span class="line"><span class="cl">│                    页面加载时间对比                       │
+</span></span><span class="line"><span class="cl">├─────────────────────────────────────────────────────────┤
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">│  HTTP/1.1                         HTTP/2                │
+</span></span><span class="line"><span class="cl">│  ┌─────────────────┐              ┌────────┐            │
+</span></span><span class="line"><span class="cl">│  │█████████████████│              │████████│            │
+</span></span><span class="line"><span class="cl">│  │█████████████████│              │████████│            │
+</span></span><span class="line"><span class="cl">│  │█████████████████│              └────────┘            │
+</span></span><span class="line"><span class="cl">│  │█████████████████│                                    │
+</span></span><span class="line"><span class="cl">│  │█████████████████│              1.2s                  │
+</span></span><span class="line"><span class="cl">│  │█████████████████│                                    │
+</span></span><span class="line"><span class="cl">│  │█████████████████│                                    │
+</span></span><span class="line"><span class="cl">│  └─────────────────┘                                    │
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">│       3.8s                                              │
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">│  测试条件：100个资源，模拟 3G 网络                        │
+</span></span><span class="line"><span class="cl">│  提升幅度：约 68%                                        │
+</span></span><span class="line"><span class="cl">└─────────────────────────────────────────────────────────┘</span></span></code></pre></div></div>
+<hr>
+<h2 id="四https-安全传输">四、HTTPS 安全传输</h2>
+<h3 id="41-为什么需要-https">4.1 为什么需要 HTTPS</h3>
+<p>HTTP 明文传输的风险：</p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">HTTP 传输（可被窃听）：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">用户 ──明文密码：123456──► 黑客窃听 ◄── 明文密码：123456 ──► 服务器
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">HTTPS 传输（加密保护）：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">用户 ──加密：a#9$kL@2...──► 黑客窃听 ◄── 无法解密 ──► 服务器
+</span></span><span class="line"><span class="cl">                      （看到的是乱码）</span></span></code></pre></div></div>
+<h3 id="42-https--http--ssltls">4.2 HTTPS = HTTP + SSL/TLS</h3>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">┌─────────────────────────────────────────────────────────┐
+</span></span><span class="line"><span class="cl">│                   HTTPS 协议栈                           │
+</span></span><span class="line"><span class="cl">├─────────────────────────────────────────────────────────┤
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">│  HTTP 层    ┌─────────────────────────────────────┐     │
+</span></span><span class="line"><span class="cl">│             │  HTTP 协议（GET/POST/响应等）          │     │
+</span></span><span class="line"><span class="cl">│             └──────────────┬────────────────────────┘     │
+</span></span><span class="line"><span class="cl">│                            │                             │
+</span></span><span class="line"><span class="cl">│  SSL/TLS 层 ┌──────────────▼────────────────────────┐     │
+</span></span><span class="line"><span class="cl">│             │  握手协议    │    记录协议              │     │
+</span></span><span class="line"><span class="cl">│             │  (Handshake) │   (Record)              │     │
+</span></span><span class="line"><span class="cl">│             │              │                         │     │
+</span></span><span class="line"><span class="cl">│             │  • 证书验证   │  • 分段                 │     │
+</span></span><span class="line"><span class="cl">│             │  • 密钥交换   │  • 压缩（可选）          │     │
+</span></span><span class="line"><span class="cl">│             │  • 算法协商   │  • MAC计算              │     │
+</span></span><span class="line"><span class="cl">│             │              │  • 加密                 │     │
+</span></span><span class="line"><span class="cl">│             └──────────────┬────────────────────────┘     │
+</span></span><span class="line"><span class="cl">│                            │                             │
+</span></span><span class="line"><span class="cl">│  传输层    ┌───────────────▼────────────────────────┐     │
+</span></span><span class="line"><span class="cl">│             │          TCP 协议                       │     │
+</span></span><span class="line"><span class="cl">│             └────────────────────────────────────────┘     │
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">└─────────────────────────────────────────────────────────┘</span></span></code></pre></div></div>
+<h3 id="43-tls-握手过程">4.3 TLS 握手过程</h3>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">TLS 1.2 握手（2-RTT）：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">客户端                          服务器
+</span></span><span class="line"><span class="cl">  │                                │
+</span></span><span class="line"><span class="cl">  │ ───── ClientHello ───────────&gt; │  支持的算法列表、随机数
+</span></span><span class="line"><span class="cl">  │                                │
+</span></span><span class="line"><span class="cl">  │ &lt;──── ServerHello ──────────── │  选定算法、随机数
+</span></span><span class="line"><span class="cl">  │ &lt;──── Certificate ──────────── │  服务器证书（公钥）
+</span></span><span class="line"><span class="cl">  │ &lt;──── ServerHelloDone ──────── │
+</span></span><span class="line"><span class="cl">  │                                │
+</span></span><span class="line"><span class="cl">  │ ───── ClientKeyExchange ─────&gt; │  预主密钥（用公钥加密）
+</span></span><span class="line"><span class="cl">  │ ───── ChangeCipherSpec ──────&gt; │  切换加密模式
+</span></span><span class="line"><span class="cl">  │ ───── Finished ──────────────&gt; │  握手完成验证
+</span></span><span class="line"><span class="cl">  │                                │
+</span></span><span class="line"><span class="cl">  │ &lt;──── ChangeCipherSpec ─────── │  切换加密模式
+</span></span><span class="line"><span class="cl">  │ &lt;──── Finished ─────────────── │  握手完成验证
+</span></span><span class="line"><span class="cl">  │                                │
+</span></span><span class="line"><span class="cl">  ═══════════════════════════════════════
+</span></span><span class="line"><span class="cl">  │  加密通信开始（对称密钥）       │
+</span></span><span class="line"><span class="cl">  ═══════════════════════════════════════
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">TLS 1.3 握手（1-RTT，优化）：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">客户端                          服务器
+</span></span><span class="line"><span class="cl">  │                                │
+</span></span><span class="line"><span class="cl">  │ ───── ClientHello ───────────&gt; │  密钥份额 + 支持的算法
+</span></span><span class="line"><span class="cl">  │      + 密钥份额                 │
+</span></span><span class="line"><span class="cl">  │                                │
+</span></span><span class="line"><span class="cl">  │ &lt;──── ServerHello ──────────── │  选定算法 + 密钥份额
+</span></span><span class="line"><span class="cl">  │ &lt;──── {EncryptedExtensions} ── │  加密扩展（已加密）
+</span></span><span class="line"><span class="cl">  │ &lt;──── {Certificate} ────────── │  证书
+</span></span><span class="line"><span class="cl">  │ &lt;──── {Finished} ───────────── │  完成
+</span></span><span class="line"><span class="cl">  │                                │
+</span></span><span class="line"><span class="cl">  │ ───── {Finished} ────────────&gt; │
+</span></span><span class="line"><span class="cl">  │                                │
+</span></span><span class="line"><span class="cl">  ═══════════════════════════════════════
+</span></span><span class="line"><span class="cl">  │  加密通信开始                   │
+</span></span><span class="line"><span class="cl">  ═══════════════════════════════════════
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  {} 表示加密传输
+</span></span><span class="line"><span class="cl">  0-RTT：会话恢复时，首包即可携带数据</span></span></code></pre></div></div>
+<h3 id="44-证书体系">4.4 证书体系</h3>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">┌─────────────────────────────────────────────────────────┐
+</span></span><span class="line"><span class="cl">│                  PKI 证书体系                            │
+</span></span><span class="line"><span class="cl">├─────────────────────────────────────────────────────────┤
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">│                         ┌─────────┐                      │
+</span></span><span class="line"><span class="cl">│                         │  Root CA │  根证书（自签名）     │
+</span></span><span class="line"><span class="cl">│                         │ (根证书) │                     │
+</span></span><span class="line"><span class="cl">│                         └────┬────┘                      │
+</span></span><span class="line"><span class="cl">│                              │ 签名                      │
+</span></span><span class="line"><span class="cl">│              ┌───────────────┼───────────────┐          │
+</span></span><span class="line"><span class="cl">│              │               │               │          │
+</span></span><span class="line"><span class="cl">│         ┌────▼────┐     ┌────▼────┐    ┌────▼────┐     │
+</span></span><span class="line"><span class="cl">│         │Intermediate│  │Intermediate│  │Intermediate│   │
+</span></span><span class="line"><span class="cl">│         │   CA     │    │   CA     │    │   CA     │    │
+</span></span><span class="line"><span class="cl">│         └────┬────┘     └────┬────┘    └────┬────┘    │
+</span></span><span class="line"><span class="cl">│              │               │               │         │
+</span></span><span class="line"><span class="cl">│         ┌────▼────┐     ┌────▼────┐    ┌────▼────┐    │
+</span></span><span class="line"><span class="cl">│         │ 服务器证书 │    │ 服务器证书 │    │ 服务器证书 │   │
+</span></span><span class="line"><span class="cl">│         │example.com│   │ blog.com  │   │ shop.com  │   │
+</span></span><span class="line"><span class="cl">│         └─────────┘     └─────────┘    └─────────┘    │
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">│  证书链验证：服务器证书 ← 中间 CA ← 根证书                │
+</span></span><span class="line"><span class="cl">│  根证书预装在操作系统/浏览器中                            │
+</span></span><span class="line"><span class="cl">└─────────────────────────────────────────────────────────┘</span></span></code></pre></div></div>
+<h3 id="45-https-配置示例">4.5 HTTPS 配置示例</h3>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-nginx">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="cl"><span class="c1"># Nginx HTTPS 配置
+</span></span></span><span class="line"><span class="cl"><span class="k">server</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">listen</span> <span class="mi">443</span> <span class="s">ssl</span> <span class="s">http2</span><span class="p">;</span>           <span class="c1"># 启用 HTTP/2
+</span></span></span><span class="line"><span class="cl">    <span class="kn">server_name</span> <span class="s">example.com</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 证书配置
+</span></span></span><span class="line"><span class="cl">    <span class="kn">ssl_certificate</span>     <span class="s">/etc/nginx/ssl/example.com.crt</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">ssl_certificate_key</span> <span class="s">/etc/nginx/ssl/example.com.key</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># TLS 版本（禁用不安全的 SSLv2/3、TLS 1.0/1.1）
+</span></span></span><span class="line"><span class="cl">    <span class="kn">ssl_protocols</span>       <span class="s">TLSv1.2</span> <span class="s">TLSv1.3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 加密套件（前向保密）
+</span></span></span><span class="line"><span class="cl">    <span class="kn">ssl_ciphers</span>         <span class="s">ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">ssl_prefer_server_ciphers</span> <span class="no">on</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 会话缓存
+</span></span></span><span class="line"><span class="cl">    <span class="kn">ssl_session_cache</span>   <span class="s">shared:SSL:10m</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">ssl_session_timeout</span> <span class="mi">10m</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># HSTS（强制 HTTPS）
+</span></span></span><span class="line"><span class="cl">    <span class="kn">add_header</span> <span class="s">Strict-Transport-Security</span> <span class="s">&#34;max-age=31536000</span><span class="p">;</span> <span class="kn">includeSubDomains&#34;</span> <span class="s">always</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kn">location</span> <span class="s">/</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_pass</span> <span class="s">http://backend</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># HTTP 重定向到 HTTPS
+</span></span></span><span class="line"><span class="cl"><span class="k">server</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">listen</span> <span class="mi">80</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">server_name</span> <span class="s">example.com</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">return</span> <span class="mi">301</span> <span class="s">https://</span><span class="nv">$server_name$request_uri</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div></div>
+<hr>
+<h2 id="五协议对比总结">五、协议对比总结</h2>
+<h3 id="51-功能特性对比">5.1 功能特性对比</h3>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>HTTP/1.1</th>
+          <th>HTTP/2</th>
+          <th>HTTPS</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>传输安全</strong></td>
+          <td>❌ 明文</td>
+          <td>❌ 明文</td>
+          <td>✅ 加密</td>
+      </tr>
+      <tr>
+          <td><strong>传输效率</strong></td>
+          <td>⭐⭐</td>
+          <td>⭐⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐（有加密开销）</td>
+      </tr>
+      <tr>
+          <td><strong>并发能力</strong></td>
+          <td>6-8连接/域名</td>
+          <td>100+ Stream/连接</td>
+          <td>同 HTTP</td>
+      </tr>
+      <tr>
+          <td><strong>队头阻塞</strong></td>
+          <td>✅ 存在</td>
+          <td>✅ 解决</td>
+          <td>同 HTTP</td>
+      </tr>
+      <tr>
+          <td><strong>头部压缩</strong></td>
+          <td>❌</td>
+          <td>✅ HPACK</td>
+          <td>同 HTTP</td>
+      </tr>
+      <tr>
+          <td><strong>服务器推送</strong></td>
+          <td>❌</td>
+          <td>✅</td>
+          <td>同 HTTP</td>
+      </tr>
+      <tr>
+          <td><strong>端口</strong></td>
+          <td>80</td>
+          <td>80/443</td>
+          <td>443</td>
+      </tr>
+      <tr>
+          <td><strong>SEO 友好</strong></td>
+          <td>⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐⭐（搜索引擎偏好）</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="52-演进关系">5.2 演进关系</h3>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">HTTP/1.0 (1996)
+</span></span><span class="line"><span class="cl">    │
+</span></span><span class="line"><span class="cl">    ├── Connection: keep-alive（非标准）
+</span></span><span class="line"><span class="cl">    │
+</span></span><span class="line"><span class="cl">HTTP/1.1 (1997/2014)
+</span></span><span class="line"><span class="cl">    │
+</span></span><span class="line"><span class="cl">    ├── 持久连接（标准）
+</span></span><span class="line"><span class="cl">    ├── 管道化
+</span></span><span class="line"><span class="cl">    ├── 分块传输
+</span></span><span class="line"><span class="cl">    └── 缓存控制增强
+</span></span><span class="line"><span class="cl">    │
+</span></span><span class="line"><span class="cl">HTTPS = HTTP + SSL/TLS
+</span></span><span class="line"><span class="cl">    │
+</span></span><span class="line"><span class="cl">    ├── TLS 1.0/1.1 (已弃用)
+</span></span><span class="line"><span class="cl">    ├── TLS 1.2 (主流)
+</span></span><span class="line"><span class="cl">    └── TLS 1.3 (最新)
+</span></span><span class="line"><span class="cl">    │
+</span></span><span class="line"><span class="cl">HTTP/2 (2015)
+</span></span><span class="line"><span class="cl">    │
+</span></span><span class="line"><span class="cl">    ├── 基于 HTTPS（主流浏览器要求）
+</span></span><span class="line"><span class="cl">    ├── 二进制分帧
+</span></span><span class="line"><span class="cl">    ├── 多路复用
+</span></span><span class="line"><span class="cl">    ├── 头部压缩
+</span></span><span class="line"><span class="cl">    └── 服务器推送
+</span></span><span class="line"><span class="cl">    │
+</span></span><span class="line"><span class="cl">HTTP/3 (2022)
+</span></span><span class="line"><span class="cl">    │
+</span></span><span class="line"><span class="cl">    └── 基于 QUIC（UDP）替代 TCP</span></span></code></pre></div></div>
+<h3 id="53-现代-web-推荐配置">5.3 现代 Web 推荐配置</h3>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">┌─────────────────────────────────────────────────────────┐
+</span></span><span class="line"><span class="cl">│              2026 年推荐 Web 协议配置                     │
+</span></span><span class="line"><span class="cl">├─────────────────────────────────────────────────────────┤
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">│  ✅ 强制 HTTPS（HSTS）                                   │
+</span></span><span class="line"><span class="cl">│     • 所有 HTTP 流量 301 重定向到 HTTPS                   │
+</span></span><span class="line"><span class="cl">│     • 启用 HSTS 头部（max-age ≥ 1年）                    │
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">│  ✅ 启用 HTTP/2 或 HTTP/3                                │
+</span></span><span class="line"><span class="cl">│     • Nginx/Apache 开启 http2 模块                       │
+</span></span><span class="line"><span class="cl">│     • 使用 TLS 1.2+（禁用 1.0/1.1）                      │
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">│  ✅ 安全配置                                             │
+</span></span><span class="line"><span class="cl">│     • 使用 Let&#39;s Encrypt 免费证书                         │
+</span></span><span class="line"><span class="cl">│     • 启用 OCSP Stapling                                 │
+</span></span><span class="line"><span class="cl">│     • 配置 CSP（内容安全策略）                            │
+</span></span><span class="line"><span class="cl">│                                                          │
+</span></span><span class="line"><span class="cl">│  ❌ 避免                                                 │
+</span></span><span class="line"><span class="cl">│     • 混合内容（HTTPS 页面加载 HTTP 资源）                │
+</span></span><span class="line"><span class="cl">│     • 过时的 TLS 版本（1.0/1.1）                          │
+</span></span><span class="line"><span class="cl">│     • 弱加密套件                                         │
+</span></span><span class="line"><span class="cl">└─────────────────────────────────────────────────────────┘</span></span></code></pre></div></div>
+<h3 id="54-调试工具">5.4 调试工具</h3>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-bash">
+        <span class="code-title"><i class="arrow fas fa-angle-right" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        <span class="copy" title="复制到剪贴板"><i class="far fa-copy" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 检查 HTTP 版本</span>
+</span></span><span class="line"><span class="cl">$ curl -I --http2 https://example.com
+</span></span><span class="line"><span class="cl">HTTP/2 <span class="m">200</span>
+</span></span><span class="line"><span class="cl">server: nginx/1.18.0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看 TLS 握手详情</span>
+</span></span><span class="line"><span class="cl">$ openssl s_client -connect example.com:443 -tls1_3
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 性能测试（HTTP/1.1 vs HTTP/2）</span>
+</span></span><span class="line"><span class="cl">$ h2load -n1000 -c100 -m10 https://example.com
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 浏览器开发者工具</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Network → Protocol 列显示 h2/http/1.1</span></span></span></code></pre></div></div>
+<hr>
+<h2 id="六常见问题">六、常见问题</h2>
+<h3 id="q1-http2-比-http11-快多少">Q1: HTTP/2 比 HTTP/1.1 快多少？</h3>
+<p><strong>A</strong>: 在高延迟网络下可提升 50-70%，实际取决于资源数量和大小。</p>
+<h3 id="q2-为什么-http2-要求-https">Q2: 为什么 HTTP/2 要求 HTTPS？</h3>
+<p><strong>A</strong>: 主流浏览器（Chrome/Firefox）强制要求，防止中间人攻击和兼容性问题。</p>
+<h3 id="q3-http3-和-http2-的区别">Q3: HTTP/3 和 HTTP/2 的区别？</h3>
+<p><strong>A</strong>: HTTP/3 基于 QUIC（UDP）替代 TCP，解决 TCP 队头阻塞，更适合移动网络。</p>
+<h3 id="q4-如何迁移到-https">Q4: 如何迁移到 HTTPS？</h3>
+<p><strong>A</strong>: 1) 申请 SSL 证书 2) 配置服务器 3) 301 重定向 4) 更新内部链接 5) 提交搜索引擎。</p>
+<hr>
+<p><strong>参考资源：</strong></p>
+<ul>
+<li><a href="https://tools.ietf.org/html/rfc2616" target="_blank" rel="noopener noreffer ">RFC 2616 - HTTP/1.1</a></li>
+<li><a href="https://tools.ietf.org/html/rfc7540" target="_blank" rel="noopener noreffer ">RFC 7540 - HTTP/2</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Overview" target="_blank" rel="noopener noreffer ">MDN - HTTP 概述</a></li>
+<li><a href="https://www.ssllabs.com/ssltest/" target="_blank" rel="noopener noreffer ">SSL Labs 测试</a></li>
+</ul></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2026-04-10</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="分享到 X" data-sharer="x" data-url="http://localhost:1313/posts/http-protocols-guide/" data-title="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS" data-hashtags="HTTP,HTTPS,网络协议,Web性能,HTTP2"><i class="fab fa-x-twitter" aria-hidden="true"></i></a><a href="javascript:void(0);" title="分享到 Threads" data-sharer="threads" data-url="http://localhost:1313/posts/http-protocols-guide/" data-title="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS"><i class="fab fa-threads" aria-hidden="true"></i></a><a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/http-protocols-guide/" data-hashtag="HTTP"><i class="fab fa-facebook-square" aria-hidden="true"></i></a><a href="javascript:void(0);" title="分享到 Hacker News" data-sharer="hackernews" data-url="http://localhost:1313/posts/http-protocols-guide/" data-title="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS"><i class="fab fa-hacker-news" aria-hidden="true"></i></a><a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="http://localhost:1313/posts/http-protocols-guide/" data-title="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS"><i data-svg-src="/lib/simple-icons/icons/line.min.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/http-protocols-guide/" data-title="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS" data-image="/images/covers/cover-04.jpg"><i class="fab fa-weibo" aria-hidden="true"></i></a><a href="javascript:void(0);" title="分享到 Diaspora" data-sharer="diaspora" data-url="http://localhost:1313/posts/http-protocols-guide/" data-title="HTTP 协议演进：从 HTTP/1.1 到 HTTP/2 与 HTTPS" data-description=""><i class="fab fa-diaspora" aria-hidden="true"></i></a><a href="https://t.me/share/url?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fhttp-protocols-guide%2f&amp;text=HTTP%20%e5%8d%8f%e8%ae%ae%e6%bc%94%e8%bf%9b%ef%bc%9a%e4%bb%8e%20HTTP%2f1.1%20%e5%88%b0%20HTTP%2f2%20%e4%b8%8e%20HTTPS" target="_blank" title="分享到 Telegram"><i class="fab fa-telegram" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags" aria-hidden="true"></i>&nbsp;<a href="/tags/http/">HTTP</a>,&nbsp;<a href="/tags/https/">HTTPS</a>,&nbsp;<a href="/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/">网络协议</a>,&nbsp;<a href="/tags/web%E6%80%A7%E8%83%BD/">Web性能</a>,&nbsp;<a href="/tags/http2/">HTTP2</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/java-web-frameworks-comparison/" class="prev" rel="prev" title="Java Web 技术演进：从 Servlet 到 Spring MVC 与阿里 ROP 全面对比"><i class="fas fa-angle-left" aria-hidden="true"></i>Java Web 技术演进：从 Servlet 到 Spring MVC 与阿里 ROP 全面对比</a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright" aria-hidden="true"></i><span itemprop="copyrightYear">2020 - 2026</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">咔咔</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <div id="fixed-buttons-hidden"><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment" aria-hidden="true"></i>
+            </a>
+        </div><script src="/lib/autocomplete/autocomplete.min.js"></script><script src="/lib/lunr/lunr.min.js"></script><script src="/lib/lunr/lunr.stemmer.support.min.js"></script><script src="/lib/lunr/lunr.zh.min.js"></script><script src="/lib/lazysizes/lazysizes.min.js"></script><script src="/lib/clipboard/clipboard.min.js"></script><script src="/lib/sharer/sharer.min.js"></script><script>window.config={"comment":{},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"}};</script><script src="/js/theme.js"></script></body>
+</html>
